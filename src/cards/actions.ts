@@ -1,6 +1,6 @@
-import type { Localize } from '../../localize/localize';
-import type { Plant } from '../../data/model';
-import type { ActionConfig } from '../../types/hass';
+import type { Localize } from '../localize/localize';
+import type { Plant } from '../data/model';
+import type { ActionConfig } from '../types/hass';
 
 export type ActionKind = 'tap' | 'hold';
 
@@ -54,11 +54,20 @@ export const HOLD_MS = 500;
 const MOVE_TOLERANCE = 10;
 
 // Tap / hold gesture on one element. A hold suppresses the tap that would follow it.
-// Returns a cleanup function.
-export function bindGestures(el: HTMLElement, onAction: (kind: ActionKind) => void): () => void {
+// `origin` is the innermost element the gesture started on, across shadow roots, so one
+// listener can serve several rows. Returns a cleanup function.
+export function bindGestures(
+  el: HTMLElement,
+  onAction: (kind: ActionKind, origin: Element | null) => void,
+): () => void {
   let timer: ReturnType<typeof setTimeout> | undefined;
   let start: { x: number; y: number } | undefined;
   let held = false;
+  let origin: Element | null = null;
+  const originOf = (e: Event) => {
+    const target = e.composedPath()[0];
+    return target instanceof Element ? target : null;
+  };
 
   const cancel = () => {
     clearTimeout(timer);
@@ -68,11 +77,12 @@ export function bindGestures(el: HTMLElement, onAction: (kind: ActionKind) => vo
   const down = (e: PointerEvent) => {
     if (e.button !== 0) return;
     held = false;
+    origin = originOf(e);
     start = { x: e.clientX, y: e.clientY };
     timer = setTimeout(() => {
       held = true;
       timer = undefined;
-      onAction('hold');
+      onAction('hold', origin);
     }, HOLD_MS);
   };
   const move = (e: PointerEvent) => {
@@ -84,12 +94,12 @@ export function bindGestures(el: HTMLElement, onAction: (kind: ActionKind) => vo
   const up = () => {
     const wasPressed = start !== undefined;
     cancel();
-    if (wasPressed && !held) onAction('tap');
+    if (wasPressed && !held) onAction('tap', origin);
   };
   const key = (e: KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      onAction('tap');
+      onAction('tap', originOf(e));
     }
   };
   const contextmenu = (e: Event) => {

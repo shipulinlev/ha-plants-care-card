@@ -89,6 +89,12 @@ export function discoverPlants(hass: Hass): Plant[] {
   return plants;
 }
 
+// Every entity of a plant the cards render from.
+export const plantEntityIds = (plant: Plant): string[] =>
+  [plant.water, plant.feed].flatMap((c) =>
+    [c.nextEntityId, c.statusEntityId, c.buttonEntityId].filter((id): id is string => !!id),
+  );
+
 export function plantByDevice(hass: Hass, deviceId: string): Plant | undefined {
   return discoverPlants(hass).find((p) => p.deviceId === deviceId);
 }

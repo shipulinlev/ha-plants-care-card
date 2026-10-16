@@ -1,8 +1,8 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createMockHass } from '../../../dev/mock-hass';
-import { plantByDevice } from '../../data/discover';
-import { createLocalize } from '../../localize/localize';
+import { createMockHass } from '../../dev/mock-hass';
+import { plantByDevice } from '../data/discover';
+import { createLocalize } from '../localize/localize';
 import { bindGestures, fireAction, HOLD_MS, plantActions, type ActionKind } from './actions';
 
 const t = createLocalize('en');
@@ -63,7 +63,7 @@ describe('fireAction', () => {
 
 describe('bindGestures', () => {
   let el: HTMLElement;
-  let onAction: ReturnType<typeof vi.fn<(kind: ActionKind) => void>>;
+  let onAction: ReturnType<typeof vi.fn<(kind: ActionKind, origin: Element | null) => void>>;
   let unbind: () => void;
   const pointer = (type: string, x = 0, y = 0) =>
     el.dispatchEvent(new PointerEvent(type, { button: 0, clientX: x, clientY: y }));
@@ -71,7 +71,7 @@ describe('bindGestures', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     el = document.createElement('div');
-    onAction = vi.fn<(kind: ActionKind) => void>();
+    onAction = vi.fn<(kind: ActionKind, origin: Element | null) => void>();
     unbind = bindGestures(el, onAction);
   });
   afterEach(() => {
@@ -82,14 +82,14 @@ describe('bindGestures', () => {
   it('treats a quick press as a tap', () => {
     pointer('pointerdown');
     pointer('pointerup');
-    expect(onAction.mock.calls).toEqual([['tap']]);
+    expect(onAction.mock.calls.map(([kind]) => kind)).toEqual(['tap']);
   });
 
   it('treats a long press as a hold, without a tap after it', () => {
     pointer('pointerdown');
     vi.advanceTimersByTime(HOLD_MS);
     pointer('pointerup');
-    expect(onAction.mock.calls).toEqual([['hold']]);
+    expect(onAction.mock.calls.map(([kind]) => kind)).toEqual(['hold']);
   });
 
   it('ignores a drag', () => {
@@ -104,6 +104,14 @@ describe('bindGestures', () => {
     el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
     el.dispatchEvent(new KeyboardEvent('keydown', { key: ' ' }));
     el.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
-    expect(onAction.mock.calls).toEqual([['tap'], ['tap']]);
+    expect(onAction.mock.calls.map(([kind]) => kind)).toEqual(['tap', 'tap']);
+  });
+
+  it('passes the element the gesture started on', () => {
+    const row = document.createElement('span');
+    el.append(row);
+    row.dispatchEvent(new PointerEvent('pointerdown', { button: 0, bubbles: true }));
+    el.dispatchEvent(new PointerEvent('pointerup', { button: 0 }));
+    expect(onAction.mock.calls).toEqual([['tap', row]]);
   });
 });

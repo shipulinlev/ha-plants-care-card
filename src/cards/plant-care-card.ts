@@ -1,5 +1,5 @@
 import { LitElement, css, html, nothing, type PropertyValues } from 'lit';
-import { plantByDevice } from '../data/discover';
+import { plantByDevice, plantEntityIds } from '../data/discover';
 import type { Plant } from '../data/model';
 import { createLocalize } from '../localize/localize';
 import { applyFontMode, corners, sharedStyles, type FontMode, type PhotoStyle } from '../styles';
@@ -9,7 +9,8 @@ import type {
   LovelaceCardConfig,
   LovelaceGridOptions,
 } from '../types/hass';
-import { bindGestures, fireAction, hasAction, plantActions } from './plant/actions';
+import { bindGestures, fireAction, hasAction, plantActions } from './actions';
+import { localeChanged, statesChanged } from './update';
 import { LAYOUTS, layoutStyles, type PlantLayout } from './plant/layouts';
 import { buildPlantView } from './plant/view';
 
@@ -27,11 +28,6 @@ export interface PlantCareCardConfig extends LovelaceCardConfig {
 
 const CARD_SIZE: Record<PlantLayout, number> = { header: 7, side: 4, countdown: 7 };
 const TICK_MS = 60_000;
-
-const plantEntityIds = (plant: Plant) =>
-  [plant.water, plant.feed].flatMap((c) =>
-    [c.nextEntityId, c.statusEntityId, c.buttonEntityId].filter((id): id is string => !!id),
-  );
 
 export class PlantCareCard extends LitElement {
   static properties = {
@@ -102,11 +98,10 @@ export class PlantCareCard extends LitElement {
     if (!this._plant) return prev.entities !== hass.entities || prev.devices !== hass.devices;
     const plant = this._plant;
     return (
-      plantEntityIds(plant).some((id) => prev.states[id] !== hass.states[id]) ||
+      statesChanged(prev, hass, plantEntityIds(plant)) ||
       prev.devices[plant.deviceId] !== hass.devices[plant.deviceId] ||
       (!!plant.areaId && prev.areas[plant.areaId] !== hass.areas[plant.areaId]) ||
-      prev.locale !== hass.locale ||
-      prev.config.time_zone !== hass.config.time_zone
+      localeChanged(prev, hass)
     );
   }
 
