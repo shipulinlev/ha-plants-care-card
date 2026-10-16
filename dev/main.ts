@@ -1,4 +1,5 @@
 import '../src/index';
+import './styleguide';
 import { createMockHass } from './mock-hass';
 import type { LovelaceCardConfig } from '../src/types/hass';
 
@@ -10,8 +11,14 @@ const plant = (device: string, layout = 'header') => ({
   layout,
 });
 
-// Every layout from docs/design, each rendered on a light and a dark surface.
+// The shared styles, then every layout from docs/design, each rendered on a light and a dark surface.
 const SAMPLES: Array<{ id: string; label: string; config: LovelaceCardConfig }> = [
+  { id: '0', label: 'Styles', config: { type: 'plant-care-styleguide' } },
+  {
+    id: '0-theme',
+    label: 'Styles: theme font',
+    config: { type: 'plant-care-styleguide', font: 'theme' },
+  },
   { id: '1a', label: 'Photo header', config: plant('monstera') },
   { id: '1b', label: 'Side photo + progress', config: plant('monstera', 'side') },
   { id: '1c', label: 'Countdown + ruler', config: plant('monstera', 'countdown') },
