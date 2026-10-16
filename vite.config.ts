@@ -12,7 +12,7 @@ export default defineConfig({
     lib: {
       entry: 'src/index.ts',
       formats: ['es'],
-      fileName: () => 'ha-plants-card.js',
+      fileName: () => 'ha-plants-care-card.js',
     },
   },
   test: {
