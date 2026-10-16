@@ -2,7 +2,7 @@
 
 Lovelace dashboard cards for the [Plant Care](https://github.com/shipulinlev/ha-plant-care) integration. One card shows a single plant's next watering and feeding. The other shows every plant in a room, the most urgent first.
 
-> **Status:** early development, pre-v0.1.0. Both cards follow the layouts in [docs/design/](docs/design/); a visual editor comes next.
+> **Status:** early development, pre-v0.1.0. Both cards follow the layouts in [docs/design/](docs/design/) and have visual editors; small additions to the integration (species, interval, photo) come next.
 
 > [!WARNING]
 > **AI-assisted project ("vibe coded").** These cards are designed and written largely by an AI coding assistant ([Claude Code](https://claude.com/claude-code)), with a human steering, reviewing and testing. Treat them as experimental: review the code before relying on it, and please report anything that looks wrong.
@@ -31,6 +31,8 @@ Copy `ha-plants-care-card.js` from the latest release to `<config>/www/`. Then a
 **Requirements:** the [Plant Care](https://github.com/shipulinlev/ha-plant-care) integration with at least one plant.
 
 ## Configuration
+
+Both cards are in the dashboard's card picker (_Add card → Plant Care_), and the preview already shows one of your plants. The visual editor sets every option below except the area card's `images`, which is YAML only. Options left at their defaults are not written to the YAML.
 
 ### Plant card
 
