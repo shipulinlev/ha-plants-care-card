@@ -12,16 +12,44 @@
   "tomorrow": "Tomorrow",
   "tomorrow_lower": "tomorrow",
   "due_today": "Due today",
-  "in_days": { "one": "in {n} day", "other": "in {n} days" },
-  "days_late": { "one": "{n} day late", "other": "{n} days late" },
+  "in_days": {
+    "one": "in {n} day",
+    "other": "in {n} days"
+  },
+  "days_late": {
+    "one": "{n} day late",
+    "other": "{n} days late"
+  },
   "was_due": "Was due {date}",
-  "every_days": { "one": "every day", "other": "every {n} days" },
-  "unit_day": { "one": "day", "other": "days" },
-  "unit_late": { "one": "day late", "other": "days late" },
+  "every_days": {
+    "one": "every day",
+    "other": "every {n} days"
+  },
+  "unit_day": {
+    "one": "day",
+    "other": "days"
+  },
+  "unit_late": {
+    "one": "day late",
+    "other": "days late"
+  },
   "short_days": "{n} d",
   "short_late": "{n} d late",
-  "plants_count": { "one": "{n} plant", "other": "{n} plants" },
-  "need_care_today": { "one": "{n} needs care today", "other": "{n} need care today" },
+  "plants_count": {
+    "one": "{n} plant",
+    "other": "{n} plants"
+  },
+  "need_care_today": {
+    "one": "{n} needs care today",
+    "other": "{n} need care today"
+  },
   "all_on_schedule": "All on schedule",
-  "no_plants": "No plants in this area"
+  "no_plants": "No plants in this area",
+  "next": "Next",
+  "then": "Then {label}",
+  "next_14_days": "Next 14 days",
+  "photo": "Photo",
+  "plant_photo": "Plant photo",
+  "confirm_water": "Log a watering for {name}?",
+  "plant_not_found": "Plant not found: {name}"
 }

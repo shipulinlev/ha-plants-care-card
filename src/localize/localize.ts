@@ -4,7 +4,13 @@ type Entry = string | (Partial<Record<Intl.LDMLPluralRule, string>> & { other: s
 type Dictionary = Record<string, Entry>;
 
 export type TranslationKey = keyof typeof en;
-export type Localize = (key: TranslationKey, vars?: { n?: number; date?: string }) => string;
+export interface LocalizeVars {
+  n?: number;
+  date?: string;
+  name?: string;
+  label?: string;
+}
+export type Localize = (key: TranslationKey, vars?: LocalizeVars) => string;
 
 // Add a language by adding its JSON here; missing keys fall back to English.
 const LANGUAGES: Record<string, Dictionary> = { en };
@@ -19,7 +25,9 @@ export function createLocalize(language: string): Localize {
     const entry = dict[key] ?? (en as Dictionary)[key] ?? key;
     const template =
       typeof entry === 'string' ? entry : (entry[plurals.select(vars.n ?? 0)] ?? entry.other);
-    return template.replace(/\{(n|date)\}/g, (_, name: 'n' | 'date') => String(vars[name] ?? ''));
+    return template.replace(/\{(n|date|name|label)\}/g, (_, v: keyof LocalizeVars) =>
+      String(vars[v] ?? ''),
+    );
   };
 }
 

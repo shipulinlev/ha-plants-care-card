@@ -56,3 +56,24 @@ export interface LovelaceGridOptions {
   min_columns?: number;
   min_rows?: number;
 }
+
+// Standard Lovelace action config, handled by the frontend through the hass-action event.
+export interface ActionConfig {
+  action:
+    | 'none'
+    | 'more-info'
+    | 'toggle'
+    | 'navigate'
+    | 'url'
+    | 'perform-action'
+    | 'assist'
+    | 'fire-dom-event';
+  entity?: string;
+  perform_action?: string;
+  data?: Record<string, unknown>;
+  target?: Record<string, unknown>;
+  navigation_path?: string;
+  url_path?: string;
+  confirmation?: boolean | { text?: string };
+  [key: string]: unknown;
+}
