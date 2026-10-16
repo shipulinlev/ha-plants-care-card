@@ -1,19 +1,38 @@
 name: Validate
 
+# HACS finds the card in the latest release's assets (dist/ is not committed), so validate
+# after the Release workflow has attached it, on demand, and nightly once a release exists.
 on:
-  push:
-  pull_request:
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
   schedule:
     - cron: '0 0 * * *'
   workflow_dispatch:
 
-permissions: {}
+permissions:
+  contents: read
 
 jobs:
   validate-hacs:
     runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     steps:
+      - name: Check for a release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view --repo "${{ github.repository }}" > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No release yet; HACS validation needs one to find the card."
+          fi
       - name: HACS validation
+        if: steps.release.outputs.exists == 'true' || github.event_name == 'workflow_dispatch'
         uses: hacs/action@main
         with:
           category: plugin
+          # No card screenshots in the README yet; drop this once there are.
+          ignore: images
