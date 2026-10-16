@@ -2,7 +2,7 @@
 
 Lovelace dashboard cards for the [Plant Care](https://github.com/shipulinlev/ha-plant-care) integration. One card shows a single plant's next watering and feeding. The other shows every plant in a room, the most urgent first.
 
-> **Status:** early development, pre-v0.1.0. The plant card is usable; the area card is a placeholder until its layouts from [docs/design/](docs/design/) are implemented.
+> **Status:** early development, pre-v0.1.0. Both cards follow the layouts in [docs/design/](docs/design/); a visual editor comes next.
 
 > [!WARNING]
 > **AI-assisted project ("vibe coded").** These cards are designed and written largely by an AI coding assistant ([Claude Code](https://claude.com/claude-code)), with a human steering, reviewing and testing. Treat them as experimental: review the code before relying on it, and please report anything that looks wrong.
@@ -66,11 +66,19 @@ layout: list
 date_format: relative
 ```
 
-| Option        | Default    | Description              |
-| ------------- | ---------- | ------------------------ |
-| `area`        | required   | the area ID              |
-| `layout`      | `list`     | `list` or `grid`         |
-| `date_format` | `relative` | `relative` or `absolute` |
+| Option        | Default        | Description                                                     |
+| ------------- | -------------- | --------------------------------------------------------------- |
+| `area`        | required       | the area ID                                                     |
+| `layout`      | `list`         | `list` or `grid`                                                |
+| `date_format` | `relative`     | `relative` or `absolute`                                        |
+| `title`       | the area name  | heading text                                                    |
+| `images`      | none           | photos per plant: `{ <device_id>: /local/plants/monstera.jpg }` |
+| `photo_style` | `duotone`      | `duotone` or `natural`                                          |
+| `font`        | `design`       | `design` or `theme`                                             |
+| `tap_action`  | more-info      | applied to each plant                                           |
+| `hold_action` | log a watering | applied to each plant                                           |
+
+Plants are sorted by what needs care first. Each plant responds to tap and hold like the plant card.
 
 ## Development
 
