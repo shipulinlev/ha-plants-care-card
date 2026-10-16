@@ -2,7 +2,7 @@
 
 Lovelace dashboard cards for the [Plant Care](https://github.com/shipulinlev/ha-plant-care) integration. One card shows a single plant's next watering and feeding. The other shows every plant in a room, the most urgent first.
 
-> **Status:** early development, pre-v0.1.0. The cards are placeholders until the layouts in [docs/design/](docs/design/) are implemented.
+> **Status:** early development, pre-v0.1.0. The plant card is usable; the area card is a placeholder until its layouts from [docs/design/](docs/design/) are implemented.
 
 > [!WARNING]
 > **AI-assisted project ("vibe coded").** These cards are designed and written largely by an AI coding assistant ([Claude Code](https://claude.com/claude-code)), with a human steering, reviewing and testing. Treat them as experimental: review the code before relying on it, and please report anything that looks wrong.
@@ -43,13 +43,19 @@ show_interval: true
 image: /local/plants/monstera.jpg
 ```
 
-| Option          | Default    | Description                                                  |
-| --------------- | ---------- | ------------------------------------------------------------ |
-| `device_id`     | required   | the plant device                                             |
-| `layout`        | `header`   | `header`, `side` or `countdown`                              |
-| `date_format`   | `relative` | `relative` ("in 3 days") or `absolute` ("Thu 15 Oct")        |
-| `show_interval` | `true`     | show "every N days" under the countdown                      |
-| `image`         | none       | plant photo; without it the card shows a hatched placeholder |
+| Option          | Default        | Description                                                                 |
+| --------------- | -------------- | --------------------------------------------------------------------------- |
+| `device_id`     | required       | the plant device                                                            |
+| `layout`        | `header`       | `header`, `side` or `countdown`                                             |
+| `date_format`   | `relative`     | `relative` ("in 3 days") or `absolute` ("Thu 15 Oct")                       |
+| `show_interval` | `true`         | show "every N days" under the countdown                                     |
+| `image`         | none           | plant photo; without it the card shows a hatched placeholder                |
+| `photo_style`   | `duotone`      | `duotone` (tinted with the theme accent) or `natural`                       |
+| `font`          | `design`       | `design` (Barlow, from Google Fonts) or `theme` (the HA theme font)         |
+| `tap_action`    | more-info      | a standard [card action](https://www.home-assistant.io/dashboards/actions/) |
+| `hold_action`   | log a watering | a standard card action                                                      |
+
+Tap opens the plant's details. Hold presses the plant's **Water** button after you confirm, so a watering is logged now. Set either action to `action: none` to turn it off.
 
 ### Area card
 
