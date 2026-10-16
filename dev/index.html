@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Plant Care Cards dev</title>
+    <style>
+      /* Stand-ins for HA theme variables, set to the Industry DS tokens from docs/design/README.md. */
+      .surface.light {
+        --primary-text-color: #1d1f20;
+        --secondary-text-color: color-mix(in srgb, #1d1f20 68%, transparent);
+        --primary-color: #5980a6;
+        --rgb-primary-color: 89, 128, 166;
+        --divider-color: color-mix(in srgb, #1d1f20 16%, transparent);
+        --card-background-color: #f2f2f3;
+        background: #f2f2f3;
+        color: #1d1f20;
+      }
+      .surface.dark {
+        --primary-text-color: #f5f5f8;
+        --secondary-text-color: color-mix(in srgb, #f5f5f8 68%, transparent);
+        --primary-color: #94bce3;
+        --rgb-primary-color: 148, 188, 227;
+        --divider-color: color-mix(in srgb, #f5f5f8 20%, transparent);
+        --card-background-color: #1d2d3d;
+        background: #1d2d3d;
+        color: #f5f5f8;
+      }
+      body {
+        margin: 0;
+        padding: 24px;
+        font-family: system-ui, sans-serif;
+        background: #e6e6e8;
+      }
+      h2 {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 24px 0 8px;
+      }
+      .themes {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .surface {
+        padding: 32px;
+      }
+      .surface > * {
+        display: block;
+        width: 400px;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="samples"></main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

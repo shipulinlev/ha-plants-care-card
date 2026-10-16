@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/industry-7177be25-d486-4202-9c49-a84d149a5468/styles.css">
+<script src="_ds/industry-7177be25-d486-4202-9c49-a84d149a5468/_ds_bundle.js"></script>
+<style>body{margin:0;background:var(--color-surface);font-family:var(--font-body);color:var(--color-text)}a{color:var(--color-accent-700)}a:hover{color:var(--color-accent-800)}.dv-turn{padding:40px 44px 32px;scroll-margin-top:16px}.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 8px}.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:var(--color-text);color:var(--color-bg);text-decoration:none}.dv-tname{font:600 22px/1.2 var(--font-heading);text-transform:uppercase;letter-spacing:.02em}.dv-group{font:600 13px/1.2 var(--font-heading);text-transform:uppercase;letter-spacing:.12em;margin:36px 0 14px;color:var(--color-neutral-700)}.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:var(--color-neutral-300);color:var(--color-text);text-decoration:none}.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 12px/1.3 var(--font-body);color:var(--color-neutral-700)}.dv-card{max-width:100%;border:1px solid var(--color-divider);overflow:hidden;display:flex}.dv-opt:target .dv-oid{background:var(--color-accent);color:var(--color-bg)}.dv-next{margin:28px 0 0;font:13px/1.5 var(--font-body);color:var(--color-neutral-700)}</style>
+</helmet>
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Plant Care — dashboard cards</span></div>
+<p style="margin:0;max-width:720px;font-size:14px;line-height:1.5;color:var(--color-neutral-700);text-wrap:pretty">Masonry-width (400px) cards built on the integration's entities: <code>next_watering</code>, <code>next_feeding</code> and their <code>ok / soon / due / overdue</code> status. The countdown leads. Status is carried by fill weight in the single steel accent: outline → tint → solid accent → solid ink. Each option is shown on a light and a dark dashboard.</p>
+
+<div class="dv-group">Single plant — layouts</div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1a">
+<div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Photo header, two equal countdown cells</div>
+<div class="dv-card">
+<sc-for list="{{ themes }}" as="th" hint-placeholder-count="2">
+<div style="{{ th.style }}">
+<div class="card blueprint" style="width:400px;box-sizing:border-box;padding:0;display:flex;flex-direction:column;background:transparent">
+<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+<div style="height:176px;border-bottom:1px solid var(--color-divider);background:repeating-linear-gradient(135deg,transparent 0 7px,var(--color-divider) 7px 8px);display:flex;align-items:flex-end;padding:10px 12px;box-sizing:border-box"><span style="font:500 10px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 65%,transparent)">Plant photo</span></div>
+<div style="padding:16px 18px 14px;display:flex;flex-direction:column;gap:4px">
+<div style="font:500 12px/1.3 var(--font-body);letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 68%,transparent)">{{ hero.room }} · {{ hero.species }}</div>
+<div style="font:600 30px/1 var(--font-heading);text-transform:uppercase;letter-spacing:.01em">{{ hero.name }}</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--color-divider)">
+<sc-for list="{{ hero.cares }}" as="c" hint-placeholder-count="2">
+<div style="padding:14px 18px 16px;display:flex;flex-direction:column;gap:10px;border-left:1px solid var(--color-divider);margin-left:-1px">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+<span style="display:flex;align-items:center;gap:6px;font:500 12px/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase"><sc-if value="{{ c.isWater }}" hint-placeholder-val="{{ true }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"></path></svg></sc-if><sc-if value="{{ c.isFeed }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20h10"></path><path d="M10 20c5.5-2.5.8-6.4 3-10"></path><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"></path><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"></path></svg></sc-if>{{ c.label }}</span>
+<span class="tag" style="{{ c.tagStyle }}">{{ c.statusLabel }}</span>
+</div>
+<div style="display:flex;align-items:baseline;gap:6px"><span style="font:600 52px/0.85 var(--font-heading)">{{ c.big }}</span><span style="font:500 15px/1 var(--font-heading);text-transform:uppercase;letter-spacing:.04em;color:color-mix(in srgb,var(--color-text) 68%,transparent)">{{ c.unit }}</span></div>
+<div style="font-size:12px;line-height:1.3;color:color-mix(in srgb,var(--color-text) 68%,transparent)">{{ c.sub }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div class="dv-opt" id="1b">
+<div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Side photo, interval progress bars</div>
+<div class="dv-card">
+<sc-for list="{{ themes }}" as="th" hint-placeholder-count="2">
+<div style="{{ th.style }}">
+<div class="card blueprint" style="width:400px;box-sizing:border-box;padding:0;display:flex;flex-direction:row;background:transparent">
+<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+<div style="width:116px;flex:none;border-right:1px solid var(--color-divider);background:repeating-linear-gradient(135deg,transparent 0 7px,var(--color-divider) 7px 8px);display:flex;align-items:flex-end;padding:8px 10px;box-sizing:border-box"><span style="font:500 9px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 65%,transparent)">Photo</span></div>
+<div style="flex:1;min-width:0;padding:14px 16px 16px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;flex-direction:column;gap:3px">
+<div style="font:600 24px/1 var(--font-heading);text-transform:uppercase">{{ hero.name }}</div>
+<div style="font-size:12px;line-height:1.3;color:color-mix(in srgb,var(--color-text) 68%,transparent)">{{ hero.room }} · {{ hero.species }}</div>
+</div>
+<sc-for list="{{ hero.cares }}" as="c" hint-placeholder-count="2">
+<div style="display:flex;flex-direction:column;gap:7px">
+<div style="display:flex;align-items:center;gap:8px">
+<span style="display:flex;align-items:center;gap:6px;font:500 12px/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase"><sc-if value="{{ c.isWater }}" hint-placeholder-val="{{ true }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"></path></svg></sc-if><sc-if value="{{ c.isFeed }}" hint-placeholder-val="{{ false }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20h10"></path><path d="M10 20c5.5-2.5.8-6.4 3-10"></path><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"></path><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"></path></svg></sc-if>{{ c.label }}</span>
+<span class="tag" style="{{ c.tagStyle }}">{{ c.statusLabel }}</span>
+<span style="margin-left:auto;font:600 18px/1 var(--font-heading);text-transform:uppercase;white-space:nowrap">{{ c.text }}</span>
+</div>
+<div style="height:4px;background:var(--color-divider);position:relative"><div style="{{ c.barStyle }}"></div></div>
+<div style="font-size:11px;line-height:1.2;color:color-mix(in srgb,var(--color-text) 68%,transparent)">{{ c.sub }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div class="dv-opt" id="1c">
+<div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Next care as hero number, 14-day ruler</div>
+<div class="dv-card">
+<sc-for list="{{ themes }}" as="th" hint-placeholder-count="2">
+<div style="{{ th.style }}">
+<div class="card blueprint" style="width:400px;box-sizing:border-box;padding:18px 18px 16px;display:flex;flex-direction:column;gap:16px;background:transparent">
+<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+<div style="display:flex;gap:14px;align-items:flex-start">
+<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+<div style="font:600 24px/1 var(--font-heading);text-transform:uppercase">{{ hero.name }}</div>
+<div style="font-size:12px;line-height:1.3;color:color-mix(in srgb,var(--color-text) 68%,transparent)">{{ hero.room }} · {{ hero.species }}</div>
+</div>
+<div style="width:84px;height:84px;flex:none;border:1px solid var(--color-divider);background:repeating-linear-gradient(135deg,transparent 0 6px,var(--color-divider) 6px 7px);display:flex;align-items:flex-end;padding:6px 7px;box-sizing:border-box"><span style="font:500 9px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 65%,transparent)">Photo</span></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;margin-top:-30px">
+<div style="display:flex;align-items:center;gap:8px;font:500 12px/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase">Next · {{ hero.next.label }}<span class="tag" style="{{ hero.next.tagStyle }}">{{ hero.next.statusLabel }}</span></div>
+<div style="display:flex;align-items:baseline;gap:8px"><span style="font:600 88px/0.82 var(--font-heading)">{{ hero.next.big }}</span><span style="font:500 22px/1 var(--font-heading);text-transform:uppercase;letter-spacing:.04em;color:color-mix(in srgb,var(--color-text) 68%,transparent)">{{ hero.next.unit }}</span></div>
+<div style="display:flex;align-items:center;gap:8px;font-size:13px;line-height:1.3;margin-top:4px"><span style="color:color-mix(in srgb,var(--color-text) 68%,transparent)">Then {{ hero.then.label }}</span><span style="font-weight:600">{{ hero.then.text }}</span><span class="tag" style="{{ hero.then.tagStyle }}">{{ hero.then.statusLabel }}</span></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="display:grid;grid-template-columns:repeat(15,1fr);border:1px solid var(--color-divider)">
+<sc-for list="{{ hero.ruler }}" as="d" hint-placeholder-count="15">
+<div style="{{ d.cellStyle }}">
+<span style="font:500 10px/1 var(--font-body)">{{ d.label }}</span>
+<div style="display:flex;flex-direction:column;gap:3px;align-items:center;height:22px;justify-content:flex-end">
+<sc-if value="{{ d.feed }}" hint-placeholder-val="{{ false }}"><span style="width:8px;height:8px;border:1.5px solid var(--color-accent);box-sizing:border-box"></span></sc-if>
+<sc-if value="{{ d.water }}" hint-placeholder-val="{{ false }}"><span style="width:8px;height:8px;background:var(--color-accent)"></span></sc-if>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;gap:14px;font-size:11px;color:color-mix(in srgb,var(--color-text) 68%,transparent)"><span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;background:var(--color-accent)"></span>Water</span><span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border:1.5px solid var(--color-accent);box-sizing:border-box"></span>Feed</span><span style="margin-left:auto">Next 14 days</span></div>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+</div>
+
+<div class="dv-group">Status states — on <a href="#1a">1a</a></div>
+<div class="dv-opts">
+<div class="dv-opt" id="1d">
+<div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>ok · soon · due · overdue (watering shown; feeding uses the same scale)</div>
+<div class="dv-card" style="flex-direction:column">
+<sc-for list="{{ themes }}" as="th" hint-placeholder-count="2">
+<div style="{{ th.style }}">
+<div style="display:flex;gap:24px;flex-wrap:wrap">
+<sc-for list="{{ statePlants }}" as="p" hint-placeholder-count="4">
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="font:600 12px/1 var(--font-heading);letter-spacing:.14em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 68%,transparent)">{{ p.stateName }}</div>
+<div class="card blueprint" style="width:400px;box-sizing:border-box;padding:0;display:flex;flex-direction:column;background:transparent">
+<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+<div style="height:120px;border-bottom:1px solid var(--color-divider);background:repeating-linear-gradient(135deg,transparent 0 7px,var(--color-divider) 7px 8px);display:flex;align-items:flex-end;padding:10px 12px;box-sizing:border-box"><span style="font:500 10px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 65%,transparent)">Plant photo</span></div>
+<div style="padding:14px 18px 12px;display:flex;flex-direction:column;gap:4px">
+<div style="font:500 12px/1.3 var(--font-body);letter-spacing:.06em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 68%,transparent)">{{ p.room }} · {{ p.species }}</div>
+<div style="font:600 28px/1 var(--font-heading);text-transform:uppercase">{{ p.name }}</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--color-divider)">
+<sc-for list="{{ p.cares }}" as="c" hint-placeholder-count="2">
+<div style="{{ c.cellStyle }}">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+<span style="font:500 12px/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase">{{ c.label }}</span>
+<span class="tag" style="{{ c.tagStyle }}">{{ c.statusLabel }}</span>
+</div>
+<div style="display:flex;align-items:baseline;gap:6px"><span style="font:600 48px/0.85 var(--font-heading)">{{ c.big }}</span><span style="font:500 14px/1 var(--font-heading);text-transform:uppercase;letter-spacing:.04em;color:color-mix(in srgb,var(--color-text) 68%,transparent)">{{ c.unit }}</span></div>
+<div style="font-size:12px;line-height:1.3;color:color-mix(in srgb,var(--color-text) 68%,transparent)">{{ c.sub }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+
+<div class="dv-group">Room / area summary</div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1e">
+<div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>List, sorted by most urgent</div>
+<div class="dv-card">
+<sc-for list="{{ themes }}" as="th" hint-placeholder-count="2">
+<div style="{{ th.style }}">
+<div class="card blueprint" style="width:400px;box-sizing:border-box;padding:0;display:flex;flex-direction:column;background:transparent">
+<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+<div style="padding:16px 18px 14px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px">
+<div style="display:flex;flex-direction:column;gap:4px"><div style="font:500 12px/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 68%,transparent)">Area</div><div style="font:600 30px/1 var(--font-heading);text-transform:uppercase">{{ room.name }}</div></div>
+<div style="font-size:12px;line-height:1.4;text-align:right;color:color-mix(in srgb,var(--color-text) 68%,transparent)">{{ room.countText }}<br>{{ room.attnText }}</div>
+</div>
+<div style="display:grid;grid-template-columns:44px 1fr 74px 74px;column-gap:12px;padding:0 18px 6px;font:500 10px/1 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 68%,transparent)"><span></span><span>Plant</span><span>Water</span><span>Feed</span></div>
+<sc-for list="{{ room.plants }}" as="p" hint-placeholder-count="4">
+<div style="display:grid;grid-template-columns:44px 1fr 74px 74px;column-gap:12px;align-items:center;padding:10px 18px;border-top:1px solid var(--color-divider)">
+<div style="width:44px;height:44px;border:1px solid var(--color-divider);box-sizing:border-box;background:repeating-linear-gradient(135deg,transparent 0 5px,var(--color-divider) 5px 6px)"></div>
+<div style="min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font:600 18px/1 var(--font-heading);text-transform:uppercase">{{ p.name }}</span><span style="font-size:11px;line-height:1.2;color:color-mix(in srgb,var(--color-text) 68%,transparent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.species }}</span></div>
+<span class="tag" style="{{ p.w.chipStyle }}">{{ p.w.short }}</span>
+<span class="tag" style="{{ p.f.chipStyle }}">{{ p.f.short }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div class="dv-opt" id="1f">
+<div class="dv-olabel"><a class="dv-oid" href="#1f">1f</a>Two-column grid of plant cells</div>
+<div class="dv-card">
+<sc-for list="{{ themes }}" as="th" hint-placeholder-count="2">
+<div style="{{ th.style }}">
+<div class="card blueprint" style="width:400px;box-sizing:border-box;padding:0;display:flex;flex-direction:column;background:transparent">
+<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+<div style="padding:16px 18px 14px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:1px solid var(--color-divider)">
+<div style="font:600 30px/1 var(--font-heading);text-transform:uppercase">{{ room.name }}</div>
+<div style="font-size:12px;line-height:1.4;color:color-mix(in srgb,var(--color-text) 68%,transparent)">{{ room.attnText }}</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr">
+<sc-for list="{{ room.plants }}" as="p" hint-placeholder-count="4">
+<div style="{{ p.gridCellStyle }}">
+<div style="height:84px;border:1px solid var(--color-divider);box-sizing:border-box;background:repeating-linear-gradient(135deg,transparent 0 6px,var(--color-divider) 6px 7px)"></div>
+<div style="font:600 18px/1 var(--font-heading);text-transform:uppercase">{{ p.name }}</div>
+<div style="display:flex;align-items:baseline;gap:5px"><span style="font:600 36px/0.85 var(--font-heading)">{{ p.w.big }}</span><span style="font:500 12px/1 var(--font-heading);text-transform:uppercase;letter-spacing:.04em;color:color-mix(in srgb,var(--color-text) 68%,transparent)">{{ p.w.unit }}</span><span style="margin-left:auto"><span class="tag" style="{{ p.w.tagStyle }}">{{ p.w.statusLabel }}</span></span></div>
+<div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:color-mix(in srgb,var(--color-text) 68%,transparent)"><span>Water</span><span>Feed {{ p.f.textLower }}</span></div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+</div>
+<p class="dv-next">Try next: "combine the photo header of <a class="dv-oid" href="#1a">1a</a> with the ruler from <a class="dv-oid" href="#1c">1c</a>" · "add Water / Feed buttons to <a class="dv-oid" href="#1b">1b</a>" · "a compact variant of <a class="dv-oid" href="#1e">1e</a> for the sections grid"</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;dateFormat&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;relative&quot;,&quot;absolute&quot;],&quot;default&quot;:&quot;relative&quot;,&quot;tsType&quot;:&quot;'relative'|'absolute'&quot;},&quot;showInterval&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;heroPlant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;monstera&quot;,&quot;calathea&quot;,&quot;ficus&quot;,&quot;pothos&quot;,&quot;snake&quot;],&quot;default&quot;:&quot;monstera&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const fmt = this.props.dateFormat ?? 'relative';
+    const showInterval = this.props.showInterval ?? true;
+    const today = new Date(2026, 9, 13);
+    const muted = 'color-mix(in srgb, var(--color-text) 68%, transparent)';
+    const tagStyles = {
+      ok: { border: '1px solid var(--color-divider)', color: muted, background: 'transparent' },
+      soon: { background: 'var(--color-accent-100)', color: 'var(--color-accent-800)', border: '1px solid transparent' },
+      due: { background: 'var(--color-accent)', color: 'var(--color-bg)', border: '1px solid var(--color-accent)' },
+      overdue: { background: 'var(--color-text)', color: 'var(--color-bg)', border: '1px solid var(--color-text)' },
+    };
+    const labels = { ok: 'OK', soon: 'Soon', due: 'Due', overdue: 'Overdue' };
+    const absDate = d => {
+      const x = new Date(today); x.setDate(x.getDate() + d);
+      return x.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+    };
+    const care = (c, kind) => {
+      const d = c.days, a = Math.abs(d);
+      const status = d < 0 ? 'overdue' : d === 0 ? 'due' : d <= 2 ? 'soon' : 'ok';
+      const unitWord = a === 1 ? 'day' : 'days';
+      const rel = d === 0 ? 'Today' : d > 0 ? (d === 1 ? 'Tomorrow' : `in ${d} ${unitWord}`) : `${a} ${unitWord} late`;
+      const text = fmt === 'absolute' && d > 1 ? absDate(d) : rel;
+      const frac = Math.max(0, Math.min(1, (c.interval - d) / c.interval));
+      const subParts = [];
+      subParts.push(d < 0 ? `Was due ${absDate(d)}` : d === 0 ? 'Due today' : (fmt === 'absolute' ? `in ${d} ${unitWord}` : absDate(d)));
+      if (showInterval) subParts.push(`every ${c.interval} days`);
+      const tagStyle = tagStyles[status];
+      return {
+        kind, isWater: kind === 'water', isFeed: kind === 'feed',
+        label: kind === 'water' ? 'Water' : 'Feed',
+        days: d, status, statusLabel: labels[status], tagStyle,
+        chipStyle: { ...tagStyle, justifyContent: 'center', whiteSpace: 'nowrap' },
+        big: d === 0 ? 'Today' : String(a),
+        unit: d === 0 ? '' : unitWord + (d < 0 ? ' late' : ''),
+        text, textLower: d === 0 ? 'today' : text.replace(/^Tomorrow/, 'tomorrow'),
+        short: d === 0 ? 'Today' : d > 0 ? `${d} d` : `${a} d late`,
+        sub: subParts.join(' · '),
+        barStyle: { position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.round(frac * 100)}%`, background: status === 'overdue' ? 'var(--color-text)' : 'var(--color-accent)' },
+      };
+    };
+    const raw = {
+      monstera: { name: 'Monstera', species: 'Monstera deliciosa', room: 'Living room', water: { days: 2, interval: 7 }, feed: { days: 12, interval: 30 } },
+      calathea: { name: 'Calathea', species: 'Calathea orbifolia', room: 'Bedroom', water: { days: 0, interval: 4 }, feed: { days: 5, interval: 21 } },
+      ficus: { name: 'Fiddle-leaf fig', species: 'Ficus lyrata', room: 'Living room', water: { days: -3, interval: 9 }, feed: { days: -1, interval: 28 } },
+      pothos: { name: 'Pothos', species: 'Epipremnum aureum', room: 'Living room', water: { days: 6, interval: 10 }, feed: { days: 20, interval: 30 } },
+      snake: { name: 'Snake plant', species: 'Dracaena trifasciata', room: 'Living room', water: { days: 15, interval: 21 }, feed: { days: 40, interval: 60 } },
+    };
+    const build = (key) => {
+      const p = raw[key];
+      const w = care(p.water, 'water'), f = care(p.feed, 'feed');
+      const cares = [w, f].map((c, i) => ({ ...c, cellStyle: { padding: '14px 18px 16px', display: 'flex', flexDirection: 'column', gap: '10px', borderLeft: i ? '1px solid var(--color-divider)' : 'none' } }));
+      const [next, then] = w.days <= f.days ? [w, f] : [f, w];
+      const ruler = Array.from({ length: 15 }, (_, i) => {
+        const x = new Date(today); x.setDate(x.getDate() + i);
+        return {
+          label: String(x.getDate()),
+          water: Math.max(0, w.days) === i, feed: Math.max(0, f.days) === i,
+          cellStyle: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', padding: '6px 0 6px', borderLeft: i ? '1px solid var(--color-divider)' : 'none', background: i === 0 ? 'var(--color-accent-100)' : 'transparent', color: i === 0 ? 'var(--color-accent-800)' : muted },
+        };
+      });
+      return { key, ...p, w, f, cares, next, then, ruler, urgency: Math.min(w.days, f.days) };
+    };
+    const themes = [
+      { key: 'light', style: { padding: '32px', background: 'var(--color-bg)', color: 'var(--color-text)' } },
+      { key: 'dark', style: { padding: '32px', '--color-bg': '#1d2d3d', '--color-text': '#f5f5f8', '--color-divider': 'color-mix(in srgb, #f5f5f8 20%, transparent)', '--color-accent': '#94bce3', '--color-accent-100': '#2c455d', '--color-accent-800': '#d6ebff', background: '#1d2d3d', color: '#f5f5f8' } },
+    ];
+    const states = [['ok', 'pothos'], ['soon', 'monstera'], ['due', 'calathea'], ['overdue', 'ficus']];
+    const statePlants = states.map(([s, k]) => ({ ...build(k), stateName: labels[s] }));
+    const roomPlants = ['monstera', 'ficus', 'pothos', 'snake'].map(build).sort((a, b) => a.urgency - b.urgency)
+      .map((p, i) => ({ ...p, gridCellStyle: { padding: '14px 16px 16px', display: 'flex', flexDirection: 'column', gap: '10px', borderLeft: i % 2 ? '1px solid var(--color-divider)' : 'none', borderTop: i > 1 ? '1px solid var(--color-divider)' : 'none' } }));
+    const attn = roomPlants.filter(p => p.urgency <= 0).length;
+    return {
+      themes,
+      hero: build(this.props.heroPlant ?? 'monstera'),
+      statePlants,
+      room: { name: 'Living room', plants: roomPlants, countText: `${roomPlants.length} plants`, attnText: attn ? `${attn} need${attn === 1 ? 's' : ''} care today` : 'All on schedule' },
+    };
+  }
+}
+</script>
+</body>
+</html>
