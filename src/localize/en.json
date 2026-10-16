@@ -51,5 +51,8 @@
   "photo": "Photo",
   "plant_photo": "Plant photo",
   "confirm_water": "Log a watering for {name}?",
-  "plant_not_found": "Plant not found: {name}"
+  "plant_not_found": "Plant not found: {name}",
+  "area": "Area",
+  "plant": "Plant",
+  "area_not_found": "Area not found: {name}"
 }
