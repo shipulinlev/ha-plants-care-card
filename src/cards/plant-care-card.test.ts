@@ -4,6 +4,7 @@ import { createMockHass, TODAY } from '../../dev/mock-hass';
 import { setClock } from '../data/clock';
 import type { HomeAssistant } from '../types/hass';
 import { PlantCareCard, type PlantCareCardConfig } from './plant-care-card';
+import { suggestPlantCard } from './suggest';
 
 if (!customElements.get('plant-care-card')) customElements.define('plant-care-card', PlantCareCard);
 
@@ -162,5 +163,29 @@ describe('updates', () => {
     };
     await card.updateComplete;
     expect(text('.name-lg')).toBe('Big Monty');
+  });
+});
+
+describe('card picker', () => {
+  const empty = { ...createMockHass(), entities: {} };
+
+  it('previews the first plant by name', () => {
+    expect(PlantCareCard.getStubConfig(createMockHass())).toEqual({
+      device_id: 'device_fern',
+      layout: 'header',
+    });
+    expect(PlantCareCard.getStubConfig(empty)).toEqual({ device_id: '' });
+  });
+
+  it('opens its editor', () => {
+    expect(PlantCareCard.getConfigElement().tagName).toBe('PLANT-CARE-CARD-EDITOR');
+  });
+
+  it('suggests itself for plant entities only', () => {
+    const hass = createMockHass();
+    expect(suggestPlantCard(hass, 'sensor.monstera_next_watering')).toEqual({
+      config: { type: 'custom:plant-care-card', device_id: 'device_monstera' },
+    });
+    expect(suggestPlantCard(hass, 'light.kitchen')).toBeNull();
   });
 });

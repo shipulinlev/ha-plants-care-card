@@ -1,5 +1,5 @@
 import { LitElement, css, html, nothing, type PropertyValues } from 'lit';
-import { plantByDevice, plantEntityIds } from '../data/discover';
+import { discoverPlants, plantByDevice, plantEntityIds } from '../data/discover';
 import type { Plant } from '../data/model';
 import { createLocalize } from '../localize/localize';
 import { applyFontMode, corners, sharedStyles, type FontMode, type PhotoStyle } from '../styles';
@@ -55,8 +55,10 @@ export class PlantCareCard extends LitElement {
     return document.createElement('plant-care-card-editor');
   }
 
-  static getStubConfig(): Partial<PlantCareCardConfig> {
-    return { device_id: '', layout: 'header' };
+  // The card picker's preview: the first plant by name.
+  static getStubConfig(hass?: HomeAssistant): Partial<PlantCareCardConfig> {
+    const [first] = hass ? discoverPlants(hass).sort((a, b) => a.name.localeCompare(b.name)) : [];
+    return first ? { device_id: first.deviceId, layout: 'header' } : { device_id: '' };
   }
 
   setConfig(config: PlantCareCardConfig): void {

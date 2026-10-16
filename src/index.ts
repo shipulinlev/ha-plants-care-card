@@ -2,10 +2,22 @@ import { PlantCareAreaCardEditor } from './cards/area/editor';
 import { PlantCareAreaCard } from './cards/plant-care-area-card';
 import { PlantCareCard } from './cards/plant-care-card';
 import { PlantCareCardEditor } from './cards/plant/editor';
+import { suggestPlantCard } from './cards/suggest';
+import type { HomeAssistant, LovelaceCardConfig } from './types/hass';
 
 declare global {
   interface Window {
-    customCards?: Array<{ type: string; name: string; description: string; preview?: boolean }>;
+    customCards?: Array<{
+      type: string;
+      name: string;
+      description: string;
+      preview?: boolean;
+      documentationURL?: string;
+      getEntitySuggestion?: (
+        hass: HomeAssistant,
+        entityId: string,
+      ) => { config: LovelaceCardConfig } | null;
+    }>;
   }
 }
 
@@ -18,6 +30,8 @@ define('plant-care-area-card', PlantCareAreaCard);
 define('plant-care-card-editor', PlantCareCardEditor);
 define('plant-care-area-card-editor', PlantCareAreaCardEditor);
 
+const DOCS = 'https://github.com/shipulinlev/ha-plants-care-card#readme';
+
 window.customCards = window.customCards ?? [];
 window.customCards.push(
   {
@@ -25,11 +39,14 @@ window.customCards.push(
     name: 'Plant Care',
     description: 'One plant: next watering and feeding.',
     preview: true,
+    documentationURL: DOCS,
+    getEntitySuggestion: suggestPlantCard,
   },
   {
     type: 'plant-care-area-card',
     name: 'Plant Care Area',
     description: 'Every plant in an area, most urgent first.',
     preview: true,
+    documentationURL: DOCS,
   },
 );

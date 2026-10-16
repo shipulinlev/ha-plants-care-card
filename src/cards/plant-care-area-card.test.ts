@@ -181,3 +181,15 @@ describe('updates', () => {
     expect(all('.row.plant')).toHaveLength(5);
   });
 });
+
+describe('card picker', () => {
+  it('previews the area with the most plants', () => {
+    const hass = createMockHass();
+    expect(PlantCareAreaCard.getStubConfig(hass)).toEqual({ area: 'living_room', layout: 'list' });
+    expect(PlantCareAreaCard.getStubConfig({ ...hass, entities: {} })).toEqual({ area: '' });
+  });
+
+  it('opens its editor', () => {
+    expect(PlantCareAreaCard.getConfigElement().tagName).toBe('PLANT-CARE-AREA-CARD-EDITOR');
+  });
+});

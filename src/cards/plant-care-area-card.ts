@@ -1,5 +1,5 @@
 import { LitElement, css, html, nothing, type PropertyValues } from 'lit';
-import { plantEntityIds } from '../data/discover';
+import { discoverPlants, plantEntityIds } from '../data/discover';
 import { createLocalize } from '../localize/localize';
 import { applyFontMode, corners, sharedStyles, type FontMode, type PhotoStyle } from '../styles';
 import type {
@@ -52,8 +52,15 @@ export class PlantCareAreaCard extends LitElement {
     return document.createElement('plant-care-area-card-editor');
   }
 
-  static getStubConfig(): Partial<PlantCareAreaCardConfig> {
-    return { area: '', layout: 'list' };
+  // The card picker's preview: the area with the most plants, ties by name.
+  static getStubConfig(hass?: HomeAssistant): Partial<PlantCareAreaCardConfig> {
+    const counts = new Map<string, number>();
+    for (const { areaId } of hass ? discoverPlants(hass) : []) {
+      if (areaId && hass?.areas[areaId]) counts.set(areaId, (counts.get(areaId) ?? 0) + 1);
+    }
+    const name = (id: string) => hass?.areas[id]?.name ?? id;
+    const [area] = [...counts].sort(([a, n], [b, m]) => m - n || name(a).localeCompare(name(b)));
+    return area ? { area: area[0], layout: 'list' } : { area: '' };
   }
 
   setConfig(config: PlantCareAreaCardConfig): void {
