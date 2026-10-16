@@ -14,6 +14,13 @@ const plant = (device: string, layout = 'header', extra: Partial<LovelaceCardCon
   ...extra,
 });
 
+const area = (id: string, layout = 'list', extra: Partial<LovelaceCardConfig> = {}) => ({
+  type: 'plant-care-area-card',
+  area: id,
+  layout,
+  ...extra,
+});
+
 // Show the design's dates ("Thu 15 Oct") whatever the real date is.
 setClock(() => TODAY);
 
@@ -57,6 +64,14 @@ const SAMPLES: Array<{ id: string; label: string; config: LovelaceCardConfig }> 
     label: 'Area grid',
     config: { type: 'plant-care-area-card', area: 'living_room', layout: 'grid' },
   },
+  {
+    id: 'x-area-photo',
+    label: 'Area list with a photo',
+    config: area('living_room', 'list', { images: { device_monstera: PHOTO } }),
+  },
+  { id: 'x-area-unknown', label: 'Area, no care logged', config: area('kitchen', 'grid') },
+  { id: 'x-area-empty', label: 'Empty area', config: area('office') },
+  { id: 'x-area-missing', label: 'Missing area', config: area('nope') },
 ];
 
 const hass = createMockHass();
