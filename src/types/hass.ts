@@ -39,7 +39,7 @@ export interface HomeAssistant {
   devices: Record<string, HassDevice>;
   areas: Record<string, HassArea>;
   config: { time_zone: string };
-  locale: { language: string };
+  locale: { language: string; time_zone?: 'local' | 'server' };
   language: string;
   themes?: { darkMode?: boolean };
   callService(domain: string, service: string, data?: Record<string, unknown>): Promise<unknown>;
