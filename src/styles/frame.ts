@@ -19,6 +19,7 @@ export const frame = css`
     position: absolute;
     width: 11px;
     height: 11px;
+    z-index: 1; /* above photos that fill the card edge */
     color: color-mix(in srgb, var(--pc-text) 55%, transparent);
     pointer-events: none;
   }
