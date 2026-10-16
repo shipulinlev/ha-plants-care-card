@@ -26,6 +26,14 @@ export interface PlantCareCardConfig extends LovelaceCardConfig {
   hold_action?: ActionConfig;
 }
 
+export const PLANT_DEFAULTS = {
+  layout: 'header',
+  date_format: 'relative',
+  photo_style: 'duotone',
+  font: 'design',
+  show_interval: true,
+} satisfies Partial<PlantCareCardConfig>;
+
 const CARD_SIZE: Record<PlantLayout, number> = { header: 7, side: 4, countdown: 7 };
 const TICK_MS = 60_000;
 
@@ -43,6 +51,10 @@ export class PlantCareCard extends LitElement {
   private _timer?: ReturnType<typeof setInterval>;
   private _unbind?: () => void;
 
+  static getConfigElement(): HTMLElement {
+    return document.createElement('plant-care-card-editor');
+  }
+
   static getStubConfig(): Partial<PlantCareCardConfig> {
     return { device_id: '', layout: 'header' };
   }
@@ -52,14 +64,7 @@ export class PlantCareCard extends LitElement {
     if (config.layout && !(config.layout in LAYOUTS)) {
       throw new Error(`layout must be one of: ${Object.keys(LAYOUTS).join(', ')}`);
     }
-    this._config = {
-      layout: 'header',
-      date_format: 'relative',
-      photo_style: 'duotone',
-      font: 'design',
-      show_interval: true,
-      ...config,
-    };
+    this._config = { ...PLANT_DEFAULTS, ...config };
     this._plant = undefined;
     applyFontMode(this, this._config.font ?? 'design');
   }

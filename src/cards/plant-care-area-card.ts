@@ -25,6 +25,13 @@ export interface PlantCareAreaCardConfig extends LovelaceCardConfig {
   hold_action?: ActionConfig;
 }
 
+export const AREA_DEFAULTS = {
+  layout: 'list',
+  date_format: 'relative',
+  photo_style: 'duotone',
+  font: 'design',
+} satisfies Partial<PlantCareAreaCardConfig>;
+
 const TICK_MS = 60_000;
 
 export class PlantCareAreaCard extends LitElement {
@@ -41,6 +48,10 @@ export class PlantCareAreaCard extends LitElement {
   private _timer?: ReturnType<typeof setInterval>;
   private _unbind?: () => void;
 
+  static getConfigElement(): HTMLElement {
+    return document.createElement('plant-care-area-card-editor');
+  }
+
   static getStubConfig(): Partial<PlantCareAreaCardConfig> {
     return { area: '', layout: 'list' };
   }
@@ -50,13 +61,7 @@ export class PlantCareAreaCard extends LitElement {
     if (config.layout && !(config.layout in AREA_LAYOUTS)) {
       throw new Error(`layout must be one of: ${Object.keys(AREA_LAYOUTS).join(', ')}`);
     }
-    this._config = {
-      layout: 'list',
-      date_format: 'relative',
-      photo_style: 'duotone',
-      font: 'design',
-      ...config,
-    };
+    this._config = { ...AREA_DEFAULTS, ...config };
     this._view = undefined;
     applyFontMode(this, this._config.font ?? 'design');
   }

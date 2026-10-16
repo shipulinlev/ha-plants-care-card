@@ -77,3 +77,16 @@ export interface ActionConfig {
   confirmation?: boolean | { text?: string };
   [key: string]: unknown;
 }
+
+// ha-form schema, as HA's card editors use it; only the shapes these editors need.
+export type HaFormSchema =
+  | { name: string; selector: Record<string, unknown>; required?: boolean }
+  | { type: 'grid'; name: string; schema: HaFormSchema[] }
+  | {
+      type: 'expandable';
+      name: string;
+      title: string;
+      icon?: string;
+      flatten?: boolean;
+      schema: HaFormSchema[];
+    };

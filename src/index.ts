@@ -1,5 +1,7 @@
+import { PlantCareAreaCardEditor } from './cards/area/editor';
 import { PlantCareAreaCard } from './cards/plant-care-area-card';
 import { PlantCareCard } from './cards/plant-care-card';
+import { PlantCareCardEditor } from './cards/plant/editor';
 
 declare global {
   interface Window {
@@ -13,6 +15,8 @@ const define = (tag: string, ctor: CustomElementConstructor) => {
 
 define('plant-care-card', PlantCareCard);
 define('plant-care-area-card', PlantCareAreaCard);
+define('plant-care-card-editor', PlantCareCardEditor);
+define('plant-care-area-card-editor', PlantCareAreaCardEditor);
 
 window.customCards = window.customCards ?? [];
 window.customCards.push(
