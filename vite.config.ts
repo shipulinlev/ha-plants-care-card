@@ -19,5 +19,7 @@ export default defineConfig({
     include: ['src/**/*.test.ts'],
     environment: 'node',
     passWithNoTests: true,
+    // DOM tests add the Google Fonts link; don't try to fetch it.
+    environmentOptions: { happyDOM: { settings: { handleDisabledFileLoadingAsSuccess: true } } },
   },
 });
