@@ -1,15 +1,21 @@
 import '../src/index';
 import './styleguide';
-import { createMockHass } from './mock-hass';
+import { setClock } from '../src/data/clock';
+import { PHOTO } from './fixtures';
+import { createMockHass, TODAY } from './mock-hass';
 import type { LovelaceCardConfig } from '../src/types/hass';
 
 type Card = HTMLElement & { hass: unknown; setConfig(c: LovelaceCardConfig): void };
 
-const plant = (device: string, layout = 'header') => ({
+const plant = (device: string, layout = 'header', extra: Partial<LovelaceCardConfig> = {}) => ({
   type: 'plant-care-card',
   device_id: `device_${device}`,
   layout,
+  ...extra,
 });
+
+// Show the design's dates ("Thu 15 Oct") whatever the real date is.
+setClock(() => TODAY);
 
 // The shared styles, then every layout from docs/design, each rendered on a light and a dark surface.
 const SAMPLES: Array<{ id: string; label: string; config: LovelaceCardConfig }> = [
@@ -26,6 +32,21 @@ const SAMPLES: Array<{ id: string; label: string; config: LovelaceCardConfig }> 
   { id: '1d-soon', label: 'State: soon', config: plant('monstera') },
   { id: '1d-due', label: 'State: due', config: plant('calathea') },
   { id: '1d-overdue', label: 'State: overdue', config: plant('ficus') },
+  { id: 'x-photo', label: 'Photo, duotone', config: plant('monstera', 'header', { image: PHOTO }) },
+  {
+    id: 'x-photo-side',
+    label: 'Photo, natural, side',
+    config: plant('monstera', 'side', { image: PHOTO, photo_style: 'natural' }),
+  },
+  { id: 'x-overdue-side', label: 'Overdue, side', config: plant('ficus', 'side') },
+  { id: 'x-overdue-countdown', label: 'Overdue, countdown', config: plant('ficus', 'countdown') },
+  { id: 'x-unknown', label: 'No care logged', config: plant('fern') },
+  {
+    id: 'x-unknown-countdown',
+    label: 'No care logged, countdown',
+    config: plant('fern', 'countdown'),
+  },
+  { id: 'x-missing', label: 'Missing device', config: plant('nope') },
   {
     id: '1e',
     label: 'Area list',
