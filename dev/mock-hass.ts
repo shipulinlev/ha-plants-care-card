@@ -6,14 +6,29 @@ import type {
   HomeAssistant,
 } from '../src/types/hass';
 
-// The five prototype plants from docs/design/Plant Card.dc.html, today = 2026-10-13.
+// The five prototype plants from docs/design/Plant Card.dc.html, today = 2026-10-13,
+// plus a fern with no care logged yet.
 // Species (device.model) and interval_days use the shape planned for plant_care (Phase 6).
 export const TODAY = new Date(2026, 9, 13, 12, 0, 0);
 
 type Care = { days: number; interval: number };
-type MockPlant = { name: string; species: string; area: string; water: Care; feed: Care };
+// null: no care logged yet, so the schedule sensors are unknown.
+type MockPlant = {
+  name: string;
+  species: string;
+  area: string;
+  water: Care | null;
+  feed: Care | null;
+};
 
 const PLANTS: Record<string, MockPlant> = {
+  fern: {
+    name: 'Boston fern',
+    species: 'Nephrolepis exaltata',
+    area: 'kitchen',
+    water: null,
+    feed: null,
+  },
   monstera: {
     name: 'Monstera',
     species: 'Monstera deliciosa',
@@ -68,6 +83,7 @@ export function createMockHass(): HomeAssistant {
   const areas: Record<string, HassArea> = {
     living_room: { area_id: 'living_room', name: 'Living room' },
     bedroom: { area_id: 'bedroom', name: 'Bedroom' },
+    kitchen: { area_id: 'kitchen', name: 'Kitchen' },
   };
 
   const add = (
@@ -102,20 +118,17 @@ export function createMockHass(): HomeAssistant {
       area_id: p.area,
       model: p.species,
     };
-    add(deviceId, `sensor.${key}_next_watering`, 'next_watering', at(p.water.days), {
-      device_class: 'timestamp',
-      interval_days: p.water.interval,
-    });
-    add(deviceId, `sensor.${key}_next_feeding`, 'next_feeding', at(p.feed.days), {
-      device_class: 'timestamp',
-      interval_days: p.feed.interval,
-    });
-    add(deviceId, `sensor.${key}_watering_status`, 'watering_status', statusFor(p.water.days), {
-      device_class: 'enum',
-    });
-    add(deviceId, `sensor.${key}_feeding_status`, 'feeding_status', statusFor(p.feed.days), {
-      device_class: 'enum',
-    });
+    const schedule = (care: Care | null, next: string, status: string) => {
+      add(deviceId, `sensor.${key}_${next}`, next, care ? at(care.days) : 'unknown', {
+        device_class: 'timestamp',
+        ...(care && { interval_days: care.interval }),
+      });
+      add(deviceId, `sensor.${key}_${status}`, status, care ? statusFor(care.days) : 'unknown', {
+        device_class: 'enum',
+      });
+    };
+    schedule(p.water, 'next_watering', 'watering_status');
+    schedule(p.feed, 'next_feeding', 'feeding_status');
     add(deviceId, `button.${key}_water`, 'water', 'unknown');
     add(deviceId, `button.${key}_feed`, 'feed', 'unknown');
   }

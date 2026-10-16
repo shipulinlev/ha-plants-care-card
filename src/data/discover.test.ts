@@ -21,6 +21,7 @@ describe('discoverPlants', () => {
   it('finds every plant of the mock', () => {
     const plants = discoverPlants(createMockHass());
     expect(plants.map((p) => p.name).sort()).toEqual([
+      'Boston fern',
       'Calathea',
       'Fiddle-leaf fig',
       'Monstera',
