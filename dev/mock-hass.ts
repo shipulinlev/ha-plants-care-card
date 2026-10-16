@@ -84,6 +84,7 @@ export function createMockHass(): HomeAssistant {
     living_room: { area_id: 'living_room', name: 'Living room' },
     bedroom: { area_id: 'bedroom', name: 'Bedroom' },
     kitchen: { area_id: 'kitchen', name: 'Kitchen' },
+    office: { area_id: 'office', name: 'Office' }, // no plants
   };
 
   const add = (
