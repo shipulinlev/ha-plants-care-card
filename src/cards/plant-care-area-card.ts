@@ -1,10 +1,13 @@
 import { LitElement, css, html, nothing } from 'lit';
+import { applyFontMode, corners, sharedStyles, type FontMode, type PhotoStyle } from '../styles';
 import type { HomeAssistant, LovelaceCardConfig, LovelaceGridOptions } from '../types/hass';
 
 export interface PlantCareAreaCardConfig extends LovelaceCardConfig {
   area: string;
   layout?: 'list' | 'grid';
   date_format?: 'relative' | 'absolute';
+  photo_style?: PhotoStyle;
+  font?: FontMode;
   title?: string;
   images?: Record<string, string>;
 }
@@ -25,7 +28,14 @@ export class PlantCareAreaCard extends LitElement {
 
   setConfig(config: PlantCareAreaCardConfig): void {
     if (!config.area) throw new Error('area is required');
-    this._config = { layout: 'list', date_format: 'relative', ...config };
+    this._config = {
+      layout: 'list',
+      date_format: 'relative',
+      photo_style: 'duotone',
+      font: 'design',
+      ...config,
+    };
+    applyFontMode(this, this._config.font ?? 'design');
   }
 
   getCardSize(): number {
@@ -40,16 +50,18 @@ export class PlantCareAreaCard extends LitElement {
     if (!this._config || !this.hass) return nothing;
     const area = this.hass.areas[this._config.area];
     return html`<ha-card>
-      <div class="body">${this._config.title ?? area?.name ?? this._config.area}</div>
+      ${corners()}
+      <div class="body heading">${this._config.title ?? area?.name ?? this._config.area}</div>
     </ha-card>`;
   }
 
-  static styles = css`
-    ha-card {
-      border-radius: 0;
-    }
-    .body {
-      padding: 16px 18px;
-    }
-  `;
+  static styles = [
+    sharedStyles,
+    css`
+      .body {
+        padding: 16px 18px;
+        font-size: 30px;
+      }
+    `,
+  ];
 }

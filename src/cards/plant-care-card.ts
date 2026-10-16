@@ -1,10 +1,13 @@
 import { LitElement, css, html, nothing } from 'lit';
+import { applyFontMode, corners, sharedStyles, type FontMode, type PhotoStyle } from '../styles';
 import type { HomeAssistant, LovelaceCardConfig, LovelaceGridOptions } from '../types/hass';
 
 export interface PlantCareCardConfig extends LovelaceCardConfig {
   device_id: string;
   layout?: 'header' | 'side' | 'countdown';
   date_format?: 'relative' | 'absolute';
+  photo_style?: PhotoStyle;
+  font?: FontMode;
   show_interval?: boolean;
   image?: string;
 }
@@ -25,7 +28,15 @@ export class PlantCareCard extends LitElement {
 
   setConfig(config: PlantCareCardConfig): void {
     if (!config.device_id) throw new Error('device_id is required');
-    this._config = { layout: 'header', date_format: 'relative', show_interval: true, ...config };
+    this._config = {
+      layout: 'header',
+      date_format: 'relative',
+      photo_style: 'duotone',
+      font: 'design',
+      show_interval: true,
+      ...config,
+    };
+    applyFontMode(this, this._config.font ?? 'design');
   }
 
   getCardSize(): number {
@@ -40,16 +51,20 @@ export class PlantCareCard extends LitElement {
     if (!this._config || !this.hass) return nothing;
     const device = this.hass.devices[this._config.device_id];
     return html`<ha-card>
-      <div class="body">${device?.name_by_user ?? device?.name ?? this._config.device_id}</div>
+      ${corners()}
+      <div class="body heading">
+        ${device?.name_by_user ?? device?.name ?? this._config.device_id}
+      </div>
     </ha-card>`;
   }
 
-  static styles = css`
-    ha-card {
-      border-radius: 0;
-    }
-    .body {
-      padding: 16px 18px;
-    }
-  `;
+  static styles = [
+    sharedStyles,
+    css`
+      .body {
+        padding: 16px 18px;
+        font-size: 30px;
+      }
+    `,
+  ];
 }
