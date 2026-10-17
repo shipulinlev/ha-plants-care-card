@@ -8,7 +8,7 @@ import type {
 
 // The five prototype plants from docs/design/Plant Card.dc.html, today = 2026-10-13,
 // plus a fern with no care logged yet.
-// Species (device.model) and interval_days use the shape planned for plant_care (Phase 6).
+// Species (device.model) and interval_days have the shape plant_care provides.
 export const TODAY = new Date(2026, 9, 13, 12, 0, 0);
 
 type Care = { days: number; interval: number };

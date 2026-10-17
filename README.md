@@ -2,7 +2,7 @@
 
 Lovelace dashboard cards for the [Plant Care](https://github.com/shipulinlev/ha-plant-care) integration. One card shows a single plant's next watering and feeding. The other shows every plant in a room, the most urgent first.
 
-> **Status:** early development, pre-v0.1.0. Both cards follow the layouts in [docs/design/](docs/design/) and have visual editors; small additions to the integration (species, interval, photo) come next.
+> **Status:** early development, pre-v0.1.0. Both cards follow the layouts in [docs/design/](docs/design/) and have visual editors. Next: testing in a real Home Assistant and the first release.
 
 > [!WARNING]
 > **AI-assisted project ("vibe coded").** These cards are designed and written largely by an AI coding assistant ([Claude Code](https://claude.com/claude-code)), with a human steering, reviewing and testing. Treat them as experimental: review the code before relying on it, and please report anything that looks wrong.
@@ -15,6 +15,7 @@ Lovelace dashboard cards for the [Plant Care](https://github.com/shipulinlev/ha-
   - `countdown`: the next care as a big number, with a 14-day ruler.
 - **Area card** (`custom:plant-care-area-card`): every plant in one HA area, sorted by urgency, as a `list` or a 2-column `grid`. The header says how many plants need care today.
 - **Status from the integration.** The `ok` / `soon` / `due` / `overdue` labels come from the integration's status sensors, not from the card's own calculation.
+- **Species, interval and photo from the integration.** The species name, the "every N days" interval and the OpenPlantbook photo show up when the integration provides them; plants without a species or care history simply leave them out.
 - **Follows your theme.** Colors map to HA theme variables, so the cards work on light and dark themes.
 
 ## Installation
@@ -45,17 +46,17 @@ show_interval: true
 image: /local/plants/monstera.jpg
 ```
 
-| Option          | Default        | Description                                                                 |
-| --------------- | -------------- | --------------------------------------------------------------------------- |
-| `device_id`     | required       | the plant device                                                            |
-| `layout`        | `header`       | `header`, `side` or `countdown`                                             |
-| `date_format`   | `relative`     | `relative` ("in 3 days") or `absolute` ("Thu 15 Oct")                       |
-| `show_interval` | `true`         | show "every N days" under the countdown                                     |
-| `image`         | none           | plant photo; without it the card shows a hatched placeholder                |
-| `photo_style`   | `duotone`      | `duotone` (tinted with the theme accent) or `natural`                       |
-| `font`          | `design`       | `design` (Barlow, from Google Fonts) or `theme` (the HA theme font)         |
-| `tap_action`    | more-info      | a standard [card action](https://www.home-assistant.io/dashboards/actions/) |
-| `hold_action`   | log a watering | a standard card action                                                      |
+| Option          | Default        | Description                                                                                            |
+| --------------- | -------------- | ------------------------------------------------------------------------------------------------------ |
+| `device_id`     | required       | the plant device                                                                                       |
+| `layout`        | `header`       | `header`, `side` or `countdown`                                                                        |
+| `date_format`   | `relative`     | `relative` ("in 3 days") or `absolute` ("Thu 15 Oct")                                                  |
+| `show_interval` | `true`         | show "every N days" under the countdown                                                                |
+| `image`         | none           | plant photo; without it the card uses the species photo from the integration, or a hatched placeholder |
+| `photo_style`   | `duotone`      | `duotone` (tinted with the theme accent) or `natural`                                                  |
+| `font`          | `design`       | `design` (Barlow, from Google Fonts) or `theme` (the HA theme font)                                    |
+| `tap_action`    | more-info      | a standard [card action](https://www.home-assistant.io/dashboards/actions/)                            |
+| `hold_action`   | log a watering | a standard card action                                                                                 |
 
 Tap opens the plant's details. Hold presses the plant's **Water** button after you confirm, so a watering is logged now. Set either action to `action: none` to turn it off.
 
