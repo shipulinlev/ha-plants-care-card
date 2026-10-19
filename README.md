@@ -77,6 +77,7 @@ date_format: relative
 | `layout`      | `list`         | `list` or `grid`                                                |
 | `date_format` | `relative`     | `relative` or `absolute`                                        |
 | `title`       | the area name  | heading text                                                    |
+| `show_name`   | `true`         | show the heading; `false` leaves only the summary               |
 | `images`      | none           | photos per plant: `{ <device_id>: /local/plants/monstera.jpg }` |
 | `photo_style` | `duotone`      | `duotone` or `natural`                                          |
 | `font`        | `design`       | `design` or `theme`                                             |

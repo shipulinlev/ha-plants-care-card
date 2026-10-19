@@ -11,6 +11,7 @@ export interface AreaViewConfig {
   area: string;
   date_format?: 'relative' | 'absolute';
   title?: string;
+  show_name?: boolean;
   images?: Record<string, string>;
   photo_style?: PhotoStyle;
 }
@@ -26,7 +27,7 @@ export interface AreaPlantView {
 
 // Everything an area layout renders. Layouts are pure templates over this.
 export interface AreaView {
-  title: string;
+  title: string | null; // null when the name is hidden
   countText: string;
   attentionText: string;
   plants: AreaPlantView[]; // most urgent first
@@ -53,7 +54,7 @@ export function buildAreaView(
   const plants = sortByUrgency(plantsInArea(hass, config.area), ctx);
   const { countText, attentionText } = areaSummary(plants, t, ctx.now);
   return {
-    title: config.title || area.name,
+    title: config.show_name === false ? null : config.title || area.name,
     countText,
     attentionText,
     plants: plants.map((plant) => ({

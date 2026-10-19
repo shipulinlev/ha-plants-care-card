@@ -60,6 +60,21 @@ describe('area card editor', () => {
     });
   });
 
+  it('writes show_name only when the name is hidden', async () => {
+    const { changes, change } = await mount({ area: 'living_room' });
+    change({ show_name: false });
+    expect(changes).toHaveBeenLastCalledWith({
+      type: 'custom:plant-care-area-card',
+      area: 'living_room',
+      show_name: false,
+    });
+    change({ show_name: true });
+    expect(changes).toHaveBeenLastCalledWith({
+      type: 'custom:plant-care-area-card',
+      area: 'living_room',
+    });
+  });
+
   it('keeps YAML-only images and says where to set them', async () => {
     const images = { device_monstera: '/local/m.jpg' };
     const { form, changes, change } = await mount({ area: 'living_room', images });

@@ -22,6 +22,7 @@ export interface PlantCareAreaCardConfig extends LovelaceCardConfig {
   photo_style?: PhotoStyle;
   font?: FontMode;
   title?: string;
+  show_name?: boolean;
   images?: Record<string, string>;
   tap_action?: ActionConfig;
   hold_action?: ActionConfig;
@@ -32,6 +33,7 @@ export const AREA_DEFAULTS = {
   date_format: 'relative',
   photo_style: 'duotone',
   font: 'design',
+  show_name: true,
 } satisfies Partial<PlantCareAreaCardConfig>;
 
 const TICK_MS = 60_000;

@@ -17,6 +17,7 @@ export class PlantCareAreaCardEditor extends PlantCareEditor<PlantCareAreaCardCo
         selector: { area: { device: { integration: 'plant_care' } } },
       },
       { name: 'title', selector: { text: {} } },
+      { name: 'show_name', selector: { boolean: {} } },
       {
         type: 'grid',
         name: '',

@@ -29,10 +29,14 @@ const row = (p: AreaPlantView) => html`
 // 1e: list, most urgent first.
 export const list = (v: AreaView) => html`
   <div class="area-head">
-    <div class="area-title">
-      <div class="label muted">${v.t('area')}</div>
-      <h2 class="heading area-name">${v.title}</h2>
-    </div>
+    ${
+      v.title === null
+        ? nothing
+        : html`<div class="area-title">
+            <div class="label muted">${v.t('area')}</div>
+            <h2 class="heading area-name">${v.title}</h2>
+          </div>`
+    }
     <div class="summary">${v.countText}<br />${v.attentionText}</div>
   </div>
   ${
@@ -72,7 +76,7 @@ const cell = (p: AreaPlantView, i: number) => html`
 // 1f: two-column grid of plant cells.
 export const grid = (v: AreaView) => html`
   <div class="area-head bordered">
-    <h2 class="heading area-name">${v.title}</h2>
+    ${v.title === null ? nothing : html`<h2 class="heading area-name">${v.title}</h2>`}
     <div class="summary">${v.attentionText}</div>
   </div>
   ${v.plants.length ? html`<div class="cells">${v.plants.map(cell)}</div>` : empty(v)}
@@ -105,6 +109,7 @@ export const areaLayoutStyles = css`
     font-size: 30px;
   }
   .summary {
+    margin-left: auto;
     font-size: 12px;
     line-height: 1.4;
     text-align: right;

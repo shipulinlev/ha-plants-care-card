@@ -58,6 +58,18 @@ describe('layout list (1e)', () => {
   });
 });
 
+describe('show_name', () => {
+  it('hides the area name and keeps the summary in both layouts', async () => {
+    for (const layout of ['list', 'grid'] as const) {
+      const { root, text } = await mount({ layout, show_name: false });
+      expect(root.querySelector('.area-name')).toBeNull();
+      expect(root.querySelector('.area-title')).toBeNull();
+      expect(text('.summary')).toContain('1 needs care today');
+      document.body.replaceChildren();
+    }
+  });
+});
+
 describe('layout grid (1f)', () => {
   it('renders cells with the water countdown and the feed footer', async () => {
     const { text, all, clean } = await mount({ layout: 'grid' });

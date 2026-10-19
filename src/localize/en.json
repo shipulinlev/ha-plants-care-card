@@ -62,6 +62,7 @@
   "editor.area": "Area",
   "editor.title": "Title",
   "editor.title_helper": "Defaults to the area name",
+  "editor.show_name": "Show the area name",
   "editor.layout": "Layout",
   "editor.date_format": "Dates",
   "editor.photo_style": "Photo style",
