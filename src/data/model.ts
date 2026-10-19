@@ -20,6 +20,7 @@ export interface Plant {
   areaId: string | null;
   species: string | null;
   image: string | null;
+  photoEntityId?: string;
   water: Care;
   feed: Care;
 }

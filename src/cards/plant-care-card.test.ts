@@ -231,6 +231,26 @@ describe('updates', () => {
     expect(text('.name-lg')).toBe('Monstera');
   });
 
+  it('shows a new photo when only the photo entity changes', async () => {
+    const { card, root } = await mount({});
+    const hass = card.hass!;
+    const photo = hass.states['image.monstera_photo'];
+    card.hass = {
+      ...hass,
+      states: {
+        ...hass.states,
+        'image.monstera_photo': {
+          ...photo,
+          attributes: { entity_picture: '/api/image_proxy/image.monstera_photo?token=new' },
+        },
+      },
+    };
+    await card.updateComplete;
+    expect(root.querySelector('img')!.getAttribute('src')).toBe(
+      '/api/image_proxy/image.monstera_photo?token=new',
+    );
+  });
+
   it('re-renders on a device rename', async () => {
     const { card, text } = await mount({});
     const hass = card.hass!;

@@ -8,11 +8,14 @@ const ROLES = {
   water: { next: 'next_watering', status: 'watering_status', button: 'water' },
   feed: { next: 'next_feeding', status: 'feeding_status', button: 'feed' },
 } as const satisfies Record<CareKind, Record<string, string>>;
+// The plant's photo: uploaded, else the species photo. Older integration
+// versions have no photo entity and put the species photo on next_watering.
+const PHOTO = 'photo';
 
 type Hass = Pick<HomeAssistant, 'states' | 'entities' | 'devices'>;
 type Roles = Map<string, string>; // role key → entity_id
 
-const ALL_KEYS: string[] = Object.values(ROLES).flatMap((r) => Object.values(r));
+const ALL_KEYS: string[] = [...Object.values(ROLES).flatMap((r) => Object.values(r)), PHOTO];
 
 // translation_key when the registry has it, otherwise the entity_id suffix.
 // Longest key first, so `_next_watering` never matches as `_water`.
@@ -24,8 +27,13 @@ function roleOf(entry: HassEntityRegistryEntry): string | undefined {
   const domain = entry.entity_id.split('.')[0];
   const key = SUFFIX_KEYS.find((k) => entry.entity_id.endsWith(`_${k}`));
   if (!key) return undefined;
-  const isButton = key === 'water' || key === 'feed';
-  return isButton === (domain === 'button') ? key : undefined;
+  const expected = key === 'water' || key === 'feed' ? 'button' : key === PHOTO ? 'image' : null;
+  return (expected ? domain === expected : domain !== 'button') ? key : undefined;
+}
+
+function pictureOf(hass: Hass, entityId: string | undefined): string | null {
+  const picture = entityId ? hass.states[entityId]?.attributes.entity_picture : undefined;
+  return typeof picture === 'string' && picture ? picture : null;
 }
 
 function parseDate(state: string | undefined): Date | null {
@@ -74,14 +82,14 @@ export function discoverPlants(hass: Hass): Plant[] {
   for (const [deviceId, roles] of byDevice) {
     if (!roles.has(ROLES.water.next) && !roles.has(ROLES.feed.next)) continue;
     const device = hass.devices[deviceId];
-    const waterNext = roles.get(ROLES.water.next);
-    const picture = waterNext ? hass.states[waterNext]?.attributes.entity_picture : undefined;
+    const photo = roles.get(PHOTO);
     plants.push({
       deviceId,
       name: device?.name_by_user || device?.name || deviceId,
       areaId: device?.area_id ?? null,
       species: device?.model || null,
-      image: typeof picture === 'string' && picture ? picture : null,
+      image: pictureOf(hass, photo) ?? pictureOf(hass, roles.get(ROLES.water.next)),
+      photoEntityId: photo,
       water: careOf(hass, roles, 'water'),
       feed: careOf(hass, roles, 'feed'),
     });
@@ -91,9 +99,14 @@ export function discoverPlants(hass: Hass): Plant[] {
 
 // Every entity of a plant the cards render from.
 export const plantEntityIds = (plant: Plant): string[] =>
-  [plant.water, plant.feed].flatMap((c) =>
-    [c.nextEntityId, c.statusEntityId, c.buttonEntityId].filter((id): id is string => !!id),
-  );
+  [
+    ...[plant.water, plant.feed].flatMap((c) => [
+      c.nextEntityId,
+      c.statusEntityId,
+      c.buttonEntityId,
+    ]),
+    plant.photoEntityId,
+  ].filter((id): id is string => !!id);
 
 export function plantByDevice(hass: Hass, deviceId: string): Plant | undefined {
   return discoverPlants(hass).find((p) => p.deviceId === deviceId);

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createMockHass } from '../../dev/mock-hass';
 import type { HassEntityRegistryEntry, HomeAssistant } from '../types/hass';
-import { discoverPlants, plantByDevice, plantsInArea } from './discover';
+import { discoverPlants, plantByDevice, plantEntityIds, plantsInArea } from './discover';
 
 // A one-plant hass; `edit` tweaks it before discovery.
 function singlePlant(edit: (hass: HomeAssistant) => void = () => {}): HomeAssistant {
@@ -104,11 +104,38 @@ describe('discoverPlants', () => {
     expect(plant.feed).toMatchObject({ nextAt: null, status: null });
   });
 
-  it('reads the photo from entity_picture', () => {
+  it('reads the photo from the photo entity', () => {
     const hass = singlePlant((h) => {
-      h.states['sensor.monstera_next_watering'].attributes.entity_picture = '/local/m.jpg';
+      h.states['image.monstera_photo'].attributes.entity_picture = '/api/image_proxy/x?token=t';
+      h.states['sensor.monstera_next_watering'].attributes.entity_picture = '/species.jpg';
     });
-    expect(discoverPlants(hass)[0].image).toBe('/local/m.jpg');
+    const [plant] = discoverPlants(hass);
+    expect(plant.image).toBe('/api/image_proxy/x?token=t');
+    expect(plant.photoEntityId).toBe('image.monstera_photo');
+  });
+
+  it('falls back to the species photo on next_watering', () => {
+    const hass = singlePlant((h) => {
+      h.states['sensor.monstera_next_watering'].attributes.entity_picture = '/species.jpg';
+    });
+    expect(discoverPlants(hass)[0].image).toBe('/species.jpg');
+  });
+
+  it('finds the photo entity by suffix only in the image domain', () => {
+    const hass = singlePlant((h) => {
+      delete h.entities['image.monstera_photo'].translation_key;
+      h.entities['sensor.monstera_photo'] = {
+        entity_id: 'sensor.monstera_photo',
+        platform: 'plant_care',
+        device_id: 'device_monstera',
+      };
+    });
+    expect(discoverPlants(hass)[0].photoEntityId).toBe('image.monstera_photo');
+  });
+
+  it('lists the photo entity among the entities a card renders from', () => {
+    const [plant] = discoverPlants(singlePlant());
+    expect(plantEntityIds(plant)).toContain('image.monstera_photo');
   });
 
   it('ignores other integrations on the same device', () => {

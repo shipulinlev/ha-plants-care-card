@@ -132,6 +132,8 @@ export function createMockHass(): HomeAssistant {
     schedule(p.feed, 'next_feeding', 'feeding_status');
     add(deviceId, `button.${key}_water`, 'water', 'unknown');
     add(deviceId, `button.${key}_feed`, 'feed', 'unknown');
+    // No picture: the mock has no photos, like a plant without an upload or species.
+    add(deviceId, `image.${key}_photo`, 'photo', 'unknown');
   }
 
   return {
