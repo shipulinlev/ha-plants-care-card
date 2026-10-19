@@ -51,7 +51,7 @@ export function buildAreaView(
     showInterval: false,
   };
   const plants = sortByUrgency(plantsInArea(hass, config.area), ctx);
-  const { countText, attentionText } = areaSummary(plants, t);
+  const { countText, attentionText } = areaSummary(plants, t, ctx.now);
   return {
     title: config.title || area.name,
     countText,

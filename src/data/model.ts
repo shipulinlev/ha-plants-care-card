@@ -7,7 +7,7 @@ export const CARE_STATUSES: readonly CareStatus[] = ['ok', 'soon', 'due', 'overd
 export interface Care {
   kind: CareKind;
   nextAt: Date | null;
-  status: CareStatus | null; // from the status sensor; never recomputed
+  status: CareStatus | null; // as the status sensor reports it; see careStatus()
   intervalDays: number | null;
   nextEntityId?: string;
   statusEntityId?: string;

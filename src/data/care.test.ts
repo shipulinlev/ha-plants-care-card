@@ -3,7 +3,9 @@ import { createMockHass, TODAY } from '../../dev/mock-hass';
 import { createLocalize } from '../localize/localize';
 import {
   areaSummary,
+  careStatus,
   careView,
+  liveStatus,
   needsCare,
   nextAndThen,
   ruler,
@@ -106,6 +108,36 @@ describe('careView: design copy table', () => {
     expect(careView(care(0), ctx()).textLower).toBe('today');
     expect(careView(care(1), ctx()).textLower).toBe('tomorrow');
     expect(careView(care(5), ctx()).textLower).toBe('in 5 days');
+  });
+});
+
+describe('live status', () => {
+  const HOUR = 3_600_000;
+  const at = (ms: number) => new Date(NOW.getTime() + ms);
+
+  it('follows the integration rule', () => {
+    expect(liveStatus(at(DAY + HOUR), NOW)).toBe('ok');
+    expect(liveStatus(at(DAY), NOW)).toBe('soon');
+    expect(liveStatus(at(HOUR), NOW)).toBe('soon');
+    expect(liveStatus(at(0), NOW)).toBe('due');
+    expect(liveStatus(at(-DAY + HOUR), NOW)).toBe('due');
+    expect(liveStatus(at(-DAY), NOW)).toBe('overdue');
+  });
+
+  it('moves on from a stale sensor but never below what it reports', () => {
+    expect(careStatus(care(0.5, { status: 'ok' }), NOW)).toBe('soon');
+    expect(careStatus(care(-2, { status: 'soon' }), NOW)).toBe('overdue');
+    expect(careStatus(care(2, { status: 'soon' }), NOW)).toBe('soon');
+    expect(careStatus(care(2, { status: null }), NOW)).toBeNull();
+  });
+
+  it('rolls the chip over as time passes', () => {
+    const c = care(0.5, { status: 'soon' });
+    expect(careView(c, ctx()).statusLabel).toBe('Soon');
+    expect(careView(c, ctx({ now: new Date(NOW.getTime() + DAY) })).statusLabel).toBe('Due');
+    expect(careView(c, ctx({ now: new Date(NOW.getTime() + 2 * DAY) })).statusLabel).toBe(
+      'Overdue',
+    );
   });
 });
 
@@ -224,26 +256,30 @@ describe('urgency and sorting', () => {
 
 describe('needsCare and areaSummary', () => {
   const withStatus = (water: CareStatus | null, feed: CareStatus | null) =>
-    plant('p', care(1, { status: water }), care(1, { status: feed }));
+    plant('p', care(5, { status: water }), care(5, { status: feed }));
   const t = createLocalize('en');
 
   it('follows the due/overdue statuses', () => {
-    expect(needsCare(withStatus('ok', 'soon'))).toBe(false);
-    expect(needsCare(withStatus('due', 'ok'))).toBe(true);
-    expect(needsCare(withStatus(null, 'overdue'))).toBe(true);
-    expect(needsCare(withStatus(null, null))).toBe(false);
+    expect(needsCare(withStatus('ok', 'soon'), NOW)).toBe(false);
+    expect(needsCare(withStatus('due', 'ok'), NOW)).toBe(true);
+    expect(needsCare(withStatus(null, 'overdue'), NOW)).toBe(true);
+    expect(needsCare(withStatus(null, null), NOW)).toBe(false);
+  });
+
+  it('counts care that has become due since the last poll', () => {
+    expect(needsCare(plant('p', care(-0.1), care(5)), NOW)).toBe(true);
   });
 
   it('summarises an area', () => {
-    expect(areaSummary([withStatus('ok', 'ok')], t)).toEqual({
+    expect(areaSummary([withStatus('ok', 'ok')], t, NOW)).toEqual({
       countText: '1 plant',
       attentionText: 'All on schedule',
     });
-    expect(areaSummary([withStatus('due', 'ok'), withStatus('ok', 'ok')], t)).toEqual({
+    expect(areaSummary([withStatus('due', 'ok'), withStatus('ok', 'ok')], t, NOW)).toEqual({
       countText: '2 plants',
       attentionText: '1 needs care today',
     });
-    expect(areaSummary([withStatus('due', 'ok'), withStatus('overdue', 'ok')], t)).toEqual({
+    expect(areaSummary([withStatus('due', 'ok'), withStatus('overdue', 'ok')], t, NOW)).toEqual({
       countText: '2 plants',
       attentionText: '2 need care today',
     });
@@ -251,6 +287,6 @@ describe('needsCare and areaSummary', () => {
 
   it('counts the mock living room like the design', () => {
     const living = discoverPlants(createMockHass()).filter((p) => p.areaId === 'living_room');
-    expect(areaSummary(living, t).attentionText).toBe('1 needs care today');
+    expect(areaSummary(living, t, TODAY).attentionText).toBe('1 needs care today');
   });
 });

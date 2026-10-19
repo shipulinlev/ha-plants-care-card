@@ -28,6 +28,28 @@ export interface CareView {
   progress: number | null; // 0–1 share of the interval elapsed; null without an interval
 }
 
+const DAY_MS = 86_400_000;
+// The integration's EngineSettings defaults.
+const SOON_WINDOW_MS = DAY_MS;
+const OVERDUE_AFTER_MS = DAY_MS;
+const URGENCY: Record<CareStatus, number> = { ok: 0, soon: 1, due: 2, overdue: 3 };
+
+// The integration's care_status() rule (core/status.py), evaluated now.
+export function liveStatus(nextAt: Date, now: Date): CareStatus {
+  const left = nextAt.getTime() - now.getTime();
+  if (left <= -OVERDUE_AFTER_MS) return 'overdue';
+  if (left <= 0) return 'due';
+  return left <= SOON_WINDOW_MS ? 'soon' : 'ok';
+}
+
+// The integration only re-evaluates its status sensor when it polls, so a status can lag the
+// clock. Take the more urgent of the reported and the live status; null stays "Not set".
+export function careStatus(care: Care, now: Date): CareStatus | null {
+  if (care.status === null || !care.nextAt) return care.status;
+  const live = liveStatus(care.nextAt, now);
+  return URGENCY[live] > URGENCY[care.status] ? live : care.status;
+}
+
 export function careDays(care: Care, ctx: Pick<CareContext, 'now' | 'timeZone'>): number | null {
   return care.nextAt ? calendarDaysBetween(ctx.now, care.nextAt, ctx.timeZone) : null;
 }
@@ -36,8 +58,9 @@ export function careView(care: Care, ctx: CareContext): CareView {
   const { t } = ctx;
   const label = t(care.kind === 'water' ? 'care.water' : 'care.feed');
   const days = careDays(care, ctx);
+  const status = careStatus(care, ctx.now);
 
-  if (days === null || care.status === null || !care.nextAt) {
+  if (days === null || status === null || !care.nextAt) {
     const none = t('none');
     return {
       kind: care.kind,
@@ -87,8 +110,8 @@ export function careView(care: Care, ctx: CareContext): CareView {
     kind: care.kind,
     label,
     days,
-    status: care.status,
-    statusLabel: t(`status.${care.status}`),
+    status,
+    statusLabel: t(`status.${status}`),
     big: days === 0 ? t('today') : String(n),
     unit: days === 0 ? '' : days < 0 ? t('unit_late', { n }) : t('unit_day', { n }),
     text,
@@ -159,16 +182,19 @@ export function sortByUrgency(
   return keyed.map((k) => k.plant);
 }
 
-// Same rule as the integration's needs_water / needs_feeding binary sensors.
-export function needsCare(plant: Plant): boolean {
-  return [plant.water.status, plant.feed.status].some((s) => s === 'due' || s === 'overdue');
+// Same rule as the integration's needs_water / needs_feeding binary sensors, on the live status.
+export function needsCare(plant: Plant, now: Date): boolean {
+  return [plant.water, plant.feed]
+    .map((c) => careStatus(c, now))
+    .some((s) => s === 'due' || s === 'overdue');
 }
 
 export function areaSummary(
   plants: Plant[],
   t: Localize,
+  now: Date,
 ): { countText: string; attentionText: string } {
-  const attention = plants.filter(needsCare).length;
+  const attention = plants.filter((p) => needsCare(p, now)).length;
   return {
     countText: t('plants_count', { n: plants.length }),
     attentionText: attention ? t('need_care_today', { n: attention }) : t('all_on_schedule'),

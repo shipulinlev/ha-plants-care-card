@@ -14,7 +14,7 @@ Lovelace dashboard cards for the [Plant Care](https://github.com/shipulinlev/ha-
   - `side`: a photo on the side and a progress bar for each care.
   - `countdown`: the next care as a big number, with a 14-day ruler.
 - **Area card** (`custom:plant-care-area-card`): every plant in one HA area, sorted by urgency, as a `list` or a 2-column `grid`. The header says how many plants need care today.
-- **Status from the integration.** The `ok` / `soon` / `due` / `overdue` labels come from the integration's status sensors, not from the card's own calculation.
+- **Status that keeps up with the clock.** The `ok` / `soon` / `due` / `overdue` labels start from the integration's status sensors. Between the integration's updates, the card applies the integration's own rule to the due time, so a label moves from Soon to Due to Overdue on time.
 - **Species, interval and photo from the integration.** The species name, the "every N days" interval and the OpenPlantbook photo show up when the integration provides them; plants without a species or care history simply leave them out.
 - **Follows your theme.** Colors map to HA theme variables, so the cards work on light and dark themes.
 
