@@ -9,7 +9,16 @@ import type {
   LovelaceCardConfig,
   LovelaceGridOptions,
 } from '../types/hass';
-import { bindGestures, fireAction, hasAction, plantActions } from './actions';
+import { careStatus } from '../data/care';
+import { now } from '../data/clock';
+import {
+  bindGestures,
+  careActions,
+  careKindAt,
+  fireAction,
+  hasAction,
+  plantActions,
+} from './actions';
 import { localeChanged, statesChanged } from './update';
 import { LAYOUTS, layoutStyles, type PlantLayout } from './plant/layouts';
 import { buildPlantView } from './plant/view';
@@ -88,13 +97,25 @@ export class PlantCareCard extends LitElement {
         fireAction(this, this._actions(this._plant), kind);
       }
     });
+    this.addEventListener('click', this._onCareClick);
   }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
     clearInterval(this._timer);
     this._unbind?.();
+    this.removeEventListener('click', this._onCareClick);
   }
+
+  // A care chip logs that care through the integration's button.
+  private _onCareClick = (e: Event) => {
+    const kind = careKindAt(e);
+    const plant = this._plant;
+    if (!kind || !plant || !this.hass) return;
+    const t = createLocalize(this.hass.locale.language);
+    const actions = careActions(plant, kind, careStatus(plant[kind], now()), t);
+    if (actions) fireAction(this, actions, 'tap');
+  };
 
   // Only this plant's entities, device, area and the locale matter; hass changes on every state.
   protected shouldUpdate(changed: PropertyValues<this>): boolean {

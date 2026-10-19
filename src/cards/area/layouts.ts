@@ -1,9 +1,10 @@
 import { css, html, nothing } from 'lit';
-import { plantPhoto, statusTag } from '../../styles';
+import { careButton, careIcon, plantPhoto } from '../../styles';
 import type { AreaPlantView, AreaView } from './view';
 
 // Layouts 1e/1f from docs/design/Plant Card.dc.html (pixel specs in docs/design/README.md).
-// Each plant carries data-device so the card's single gesture listener can find it.
+// Each plant carries data-device so the card's single gesture listener can find it;
+// its care chips carry data-care.
 
 const empty = (v: AreaView) =>
   v.plants.length ? nothing : html`<div class="empty muted">${v.t('no_plants')}</div>`;
@@ -21,7 +22,7 @@ const row = (p: AreaPlantView) => html`
       <span class="heading row-name">${p.name}</span>
       ${p.species ? html`<span class="species">${p.species}</span>` : nothing}
     </div>
-    ${statusTag(p.water, p.water.short, true)} ${statusTag(p.feed, p.feed.short, true)}
+    ${careButton(p.water, p.water.short, true)} ${careButton(p.feed, p.feed.short, true)}
   </div>
 `;
 
@@ -56,12 +57,14 @@ const cell = (p: AreaPlantView, i: number) => html`
     <div class="cell-photo">${plantPhoto({ ...p.photo, size: 'sm' })}</div>
     <div class="heading row-name">${p.name}</div>
     <div class="cell-big">
+      <span class="cell-icon" title=${p.water.label}>${careIcon('water', 15)}</span>
       <span class="number">${p.water.big}</span>
       ${p.water.unit ? html`<span class="unit">${p.water.unit}</span>` : nothing}
-      <span class="cell-tag">${statusTag(p.water)}</span>
+      <span class="cell-tag">${careButton(p.water)}</span>
     </div>
     <div class="cell-foot">
-      <span>${p.water.label}</span><span>${p.feed.label} ${p.feed.textLower}</span>
+      <span class="cell-feed">${careIcon('feed', 15)}${p.feed.label} ${p.feed.textLower}</span>
+      ${careButton(p.feed)}
     </div>
   </div>
 `;
@@ -205,6 +208,11 @@ export const areaLayoutStyles = css`
   .cell-tag {
     margin-left: auto;
   }
+  .cell-icon {
+    align-self: center;
+    display: flex;
+    color: var(--pc-muted);
+  }
   .cell-foot {
     display: flex;
     align-items: center;
@@ -212,5 +220,14 @@ export const areaLayoutStyles = css`
     gap: 8px;
     font-size: 12px;
     color: var(--pc-muted);
+  }
+  .cell-feed {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 `;

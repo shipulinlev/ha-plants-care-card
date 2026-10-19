@@ -45,7 +45,7 @@ describe('layout list (1e)', () => {
     const rows = all('.row.plant');
     expect(rows.map((r) => clean(r.querySelector('.row-name')))).toEqual(ORDER);
     const chips = (i: number) =>
-      [...rows[i].querySelectorAll('.tag')].map((t) => [t.className, t.textContent]);
+      [...rows[i].querySelectorAll('.tag')].map((t) => [t.className, clean(t)]);
     expect(chips(0)).toEqual([
       ['tag overdue chip', '3 d late'],
       ['tag overdue chip', '1 d late'],
@@ -67,10 +67,9 @@ describe('layout grid (1f)', () => {
     expect(cells.map((c) => clean(c.querySelector('.row-name')))).toEqual(ORDER);
     expect(clean(cells[0].querySelector('.number'))).toBe('3');
     expect(clean(cells[0].querySelector('.unit'))).toBe('days late');
-    expect([...cells[0].querySelectorAll('.cell-foot span')].map(clean)).toEqual([
-      'Water',
-      'Feed 1 day late',
-    ]);
+    expect(clean(cells[0].querySelector('.cell-foot'))).toBe('Feed 1 day late Overdue');
+    expect(clean(cells[0].querySelector('.cell-tag button.tag.overdue'))).toBe('Overdue');
+    expect(cells[0].querySelector('.cell-foot button')!.getAttribute('data-care')).toBe('feed');
   });
 
   it('borders the right column and the lower rows', async () => {
@@ -138,6 +137,33 @@ describe('actions', () => {
     expect(listener.mock.calls[0][0].detail).toMatchObject({
       action: 'hold',
       config: { hold_action: { target: { entity_id: 'button.snake_water' } } },
+    });
+  });
+
+  it('presses a chip to log that care for its plant only', async () => {
+    const { card, all } = await mount({});
+    const listener = vi.fn();
+    card.addEventListener('hass-action', listener);
+    const chip = all('.row.plant')[0].querySelector<HTMLButtonElement>('button[data-care=feed]')!;
+    press(chip, 'pointerdown');
+    press(chip, 'pointerup');
+    chip.click();
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(listener.mock.calls[0][0].detail.config.tap_action).toEqual({
+      action: 'perform-action',
+      perform_action: 'button.press',
+      target: { entity_id: 'button.ficus_feed' },
+    });
+  });
+
+  it('asks before logging care early', async () => {
+    const { card, all } = await mount({ layout: 'grid' });
+    const listener = vi.fn();
+    card.addEventListener('hass-action', listener);
+    all('.cell')[3].querySelector<HTMLButtonElement>('button[data-care=water]')!.click();
+    expect(listener.mock.calls[0][0].detail.config.tap_action).toMatchObject({
+      target: { entity_id: 'button.snake_water' },
+      confirmation: { text: 'Log a watering for Snake plant?' },
     });
   });
 });

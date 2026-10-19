@@ -8,7 +8,9 @@ import type {
   LovelaceCardConfig,
   LovelaceGridOptions,
 } from '../types/hass';
-import { bindGestures, fireAction, plantActions } from './actions';
+import { careStatus } from '../data/care';
+import { now } from '../data/clock';
+import { bindGestures, careActions, careKindAt, fireAction, plantActions } from './actions';
 import { AREA_LAYOUTS, areaLayoutStyles, type AreaLayout } from './area/layouts';
 import { buildAreaView, type AreaView } from './area/view';
 import { localeChanged, statesChanged } from './update';
@@ -88,20 +90,37 @@ export class PlantCareAreaCard extends LitElement {
     this._timer = setInterval(() => this._tick++, TICK_MS);
     // One listener for every plant row; the gesture's origin says which plant.
     this._unbind = bindGestures(this, (kind, origin) => {
-      const deviceId = origin?.closest<HTMLElement>('[data-device]')?.dataset.device;
-      const plant = this._view?.plants.find((p) => p.plant.deviceId === deviceId)?.plant;
+      const plant = this._plantAt(origin);
       if (plant && this.hass) {
         const t = createLocalize(this.hass.locale.language);
         fireAction(this, plantActions(plant, t, this._config), kind);
       }
     });
+    this.addEventListener('click', this._onCareClick);
   }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
     clearInterval(this._timer);
     this._unbind?.();
+    this.removeEventListener('click', this._onCareClick);
   }
+
+  private _plantAt(origin: Element | null) {
+    const deviceId = origin?.closest<HTMLElement>('[data-device]')?.dataset.device;
+    return this._view?.plants.find((p) => p.plant.deviceId === deviceId)?.plant;
+  }
+
+  // A care chip logs that care for its row's plant through the integration's button.
+  private _onCareClick = (e: Event) => {
+    const kind = careKindAt(e);
+    const origin = e.composedPath()[0];
+    const plant = this._plantAt(origin instanceof Element ? origin : null);
+    if (!kind || !plant || !this.hass) return;
+    const t = createLocalize(this.hass.locale.language);
+    const actions = careActions(plant, kind, careStatus(plant[kind], now()), t);
+    if (actions) fireAction(this, actions, 'tap');
+  };
 
   // Only this area's plants, the registries (plants can move) and the locale matter.
   protected shouldUpdate(changed: PropertyValues<this>): boolean {

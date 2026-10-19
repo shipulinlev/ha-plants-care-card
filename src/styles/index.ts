@@ -8,7 +8,7 @@ export { corners, frame } from './frame';
 export { careIcon } from './icons';
 export { ensureDesignFonts } from './fonts';
 export { plantPhoto, photoStyles, type PhotoStyle } from './photo';
-export { statusTag, tagClass, tagStyles } from './tag';
+export { careButton, statusTag, tagClass, tagStyles } from './tag';
 export { tokens } from './tokens';
 
 export type FontMode = 'design' | 'theme';

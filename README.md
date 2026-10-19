@@ -60,6 +60,8 @@ image: /local/plants/monstera.jpg
 
 Tap opens the plant's details. Hold presses the plant's **Water** button after you confirm, so a watering is logged now. Set either action to `action: none` to turn it off.
 
+In the `header` and `side` layouts the Water and Feed status chips are buttons too. Press one to log that care now. It works at any time; before the care is due, the card asks you to confirm first.
+
 ### Area card
 
 ```yaml
@@ -81,7 +83,7 @@ date_format: relative
 | `tap_action`  | more-info      | applied to each plant                                           |
 | `hold_action` | log a watering | applied to each plant                                           |
 
-Plants are sorted by what needs care first. Each plant responds to tap and hold like the plant card.
+Plants are sorted by what needs care first. Each plant responds to tap and hold like the plant card, and its Water and Feed chips log that care, as on the plant card.
 
 ## Development
 

@@ -1,7 +1,7 @@
 import { css, html, nothing } from 'lit';
 import { styleMap } from 'lit/directives/style-map.js';
 import type { CareView } from '../../data/care';
-import { careIcon, plantPhoto, statusTag } from '../../styles';
+import { careButton, careIcon, plantPhoto, statusTag } from '../../styles';
 import type { PlantView } from './view';
 
 // Layouts 1a/1b/1c from docs/design/Plant Card.dc.html (pixel specs in docs/design/README.md).
@@ -31,7 +31,7 @@ export const header = (v: PlantView) => html`
       ${[v.water, v.feed].map(
         (c) =>
           html`<div class="header-care ${c.kind}">
-            <div class="care-row">${careLabel(c)}${statusTag(c)}</div>
+            <div class="care-row">${careLabel(c)}${careButton(c)}</div>
             ${bigNumber(c)} ${c.sub ? html`<div class="sub">${c.sub}</div>` : nothing}
           </div>`,
       )}
@@ -52,7 +52,7 @@ export const side = (v: PlantView) => html`
         (c) =>
           html`<div class="side-care ${c.kind}">
             <div class="care-row">
-              ${careLabel(c, 15)}${statusTag(c)}
+              ${careLabel(c, 15)}${careButton(c)}
               <span class="heading side-text">${c.text}</span>
             </div>
             ${

@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { createMockHass, TODAY } from '../../dev/mock-hass';
 import { setClock } from '../data/clock';
 import type { HomeAssistant } from '../types/hass';
@@ -86,6 +86,86 @@ describe('layout countdown (1c)', () => {
     const today = all('.day')[0];
     expect(today.querySelector('.mark.water')).not.toBeNull();
     expect(today.querySelector('.mark.feed')).not.toBeNull();
+  });
+});
+
+describe('care chips', () => {
+  const pressed = async (config: Partial<PlantCareCardConfig>, kind: 'water' | 'feed') => {
+    const { card, root } = await mount(config);
+    const listener = vi.fn();
+    card.addEventListener('hass-action', listener);
+    root.querySelector<HTMLButtonElement>(`button.tag[data-care=${kind}]`)!.click();
+    return listener;
+  };
+
+  it.each(['header', 'side'] as const)('are buttons in the %s layout', async (layout) => {
+    const { all } = await mount({ layout });
+    expect(
+      all('button.tag').map((b) => [b.getAttribute('data-care'), b.textContent!.trim()]),
+    ).toEqual([
+      ['water', 'Soon'],
+      ['feed', 'OK'],
+    ]);
+    expect(all('button.tag')[0].getAttribute('aria-label')).toBe('Soon, Log a watering');
+  });
+
+  it('log care early after a confirmation', async () => {
+    const listener = await pressed({}, 'feed');
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(listener.mock.calls[0][0].detail).toEqual({
+      action: 'tap',
+      config: {
+        entity: 'button.monstera_feed',
+        tap_action: {
+          action: 'perform-action',
+          perform_action: 'button.press',
+          target: { entity_id: 'button.monstera_feed' },
+          confirmation: { text: 'Log a feeding for Monstera?' },
+        },
+        hold_action: { action: 'none' },
+      },
+    });
+  });
+
+  it('log due care straight away', async () => {
+    const listener = await pressed({ device_id: 'device_calathea' }, 'water');
+    expect(listener.mock.calls[0][0].detail.config.tap_action).toEqual({
+      action: 'perform-action',
+      perform_action: 'button.press',
+      target: { entity_id: 'button.calathea_water' },
+    });
+  });
+
+  it('do not also open more-info or start a hold', async () => {
+    const { card, root } = await mount({});
+    vi.useFakeTimers();
+    const listener = vi.fn();
+    card.addEventListener('hass-action', listener);
+    const chip = root.querySelector('button.tag')!;
+    const press = (type: string) =>
+      chip.dispatchEvent(new PointerEvent(type, { bubbles: true, composed: true, button: 0 }));
+    press('pointerdown');
+    vi.advanceTimersByTime(1000);
+    press('pointerup');
+    vi.useRealTimers();
+    expect(listener).not.toHaveBeenCalled();
+  });
+
+  it('roll over with the clock before the integration polls', async () => {
+    const { card, all } = await mount({});
+    setClock(() => new Date(TODAY.getTime() + 2 * 86_400_000));
+    card.requestUpdate();
+    await card.updateComplete;
+    expect(all('button.tag')[0].className).toBe('tag due');
+    setClock(() => TODAY);
+  });
+
+  it('stay plain tags without the integration button', async () => {
+    const hass = createMockHass();
+    delete hass.entities['button.monstera_water'];
+    const { all } = await mount({}, hass);
+    expect(all('.header-care.water button')).toHaveLength(0);
+    expect(all('.header-care.water .tag')).toHaveLength(1);
   });
 });
 

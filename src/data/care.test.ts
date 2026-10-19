@@ -142,6 +142,17 @@ describe('live status', () => {
 });
 
 describe('careView: details', () => {
+  it('carries the button that logs the care', () => {
+    expect(careView(care(5, { buttonEntityId: 'button.p_water' }), ctx())).toMatchObject({
+      button: 'button.p_water',
+      logLabel: 'Log a watering',
+    });
+    expect(careView(care(null, { kind: 'feed' }), ctx())).toMatchObject({
+      button: null,
+      logLabel: 'Log a feeding',
+    });
+  });
+
   it('takes the status from the integration', () => {
     const view = careView(care(5, { status: 'soon' }), ctx());
     expect(view).toMatchObject({ status: 'soon', statusLabel: 'Soon', label: 'Water' });

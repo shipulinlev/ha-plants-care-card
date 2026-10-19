@@ -26,6 +26,8 @@ export interface CareView {
   short: string; // area list chip: "3 d" / "Today" / "3 d late"
   sub: string; // "Thu 15 Oct · every 7 days"
   progress: number | null; // 0–1 share of the interval elapsed; null without an interval
+  button: string | null; // the integration's button entity that logs this care
+  logLabel: string; // "Log a watering" / "Log a feeding"
 }
 
 const DAY_MS = 86_400_000;
@@ -59,6 +61,8 @@ export function careView(care: Care, ctx: CareContext): CareView {
   const label = t(care.kind === 'water' ? 'care.water' : 'care.feed');
   const days = careDays(care, ctx);
   const status = careStatus(care, ctx.now);
+  const button = care.buttonEntityId ?? null;
+  const logLabel = t(care.kind === 'water' ? 'log.water' : 'log.feed');
 
   if (days === null || status === null || !care.nextAt) {
     const none = t('none');
@@ -75,6 +79,8 @@ export function careView(care: Care, ctx: CareContext): CareView {
       short: none,
       sub: '',
       progress: null,
+      button,
+      logLabel,
     };
   }
 
@@ -121,6 +127,8 @@ export function careView(care: Care, ctx: CareContext): CareView {
     progress: care.intervalDays
       ? Math.max(0, Math.min(1, (care.intervalDays - days) / care.intervalDays))
       : null,
+    button,
+    logLabel,
   };
 }
 
