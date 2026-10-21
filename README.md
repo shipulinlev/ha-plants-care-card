@@ -13,7 +13,7 @@ Lovelace dashboard cards for the [Plant Care](https://github.com/shipulinlev/ha-
   - `header`: a photo on top and a big countdown for each care (default).
   - `side`: a photo on the side and a progress bar for each care.
   - `countdown`: the next care as a big number, with a 14-day ruler.
-- **Area card** (`custom:plant-care-area-card`): every plant in one HA area, sorted by urgency, as a `list` or a 2-column `grid`. The header says how many plants need care today.
+- **Group card** (`custom:plant-care-group-card`): the plants of one HA area, plants you pick, or both, sorted by urgency, as a `list` or a 2-column `grid`. The header says how many plants need care today.
 - **Status that keeps up with the clock.** The `ok` / `soon` / `due` / `overdue` labels start from the integration's status sensors. Between the integration's updates, the card applies the integration's own rule to the due time, so a label moves from Soon to Due to Overdue on time.
 - **Species, interval and photo from the integration.** The species name, the "every N days" interval and the plant's photo show up when the integration provides them; plants without a species or care history simply leave them out. The photo is the one you upload in the plant's settings in the integration (_Edit plant → Photo_), or else the OpenPlantbook species photo.
 - **Follows your theme.** Colors map to HA theme variables, so the cards work on light and dark themes.
@@ -33,7 +33,7 @@ Copy `ha-plants-care-card.js` from the latest release to `<config>/www/`. Then a
 
 ## Configuration
 
-Both cards are in the dashboard's card picker (_Add card → Plant Care_), and the preview already shows one of your plants. The visual editor sets every option below except the area card's `images`, which is YAML only. Options left at their defaults are not written to the YAML.
+Both cards are in the dashboard's card picker (_Add card → Plant Care_), and the preview already shows one of your plants. The visual editor sets every option below except the group card's `images`, which is YAML only. Options left at their defaults are not written to the YAML.
 
 ### Plant card
 
@@ -62,29 +62,35 @@ Tap opens the plant's details. Hold presses the plant's **Water** button after y
 
 In the `header` and `side` layouts the Water and Feed status chips are buttons too. Press one to log that care now. It works at any time; before the care is due, the card asks you to confirm first.
 
-### Area card
+### Group card
 
 ```yaml
-type: custom:plant-care-area-card
-area: living_room
-layout: list
-date_format: relative
+type: custom:plant-care-group-card
+area: living_room # every plant in the area…
+plants: # …and/or plants you pick, by device ID
+  - 0d6c9e1f4a2b47c8a1e3f5b7d9c2e4a6
+title: Herbs
+layout: grid
 ```
 
-| Option        | Default        | Description                                                     |
-| ------------- | -------------- | --------------------------------------------------------------- |
-| `area`        | required       | the area ID                                                     |
-| `layout`      | `list`         | `list` or `grid`                                                |
-| `date_format` | `relative`     | `relative` or `absolute`                                        |
-| `title`       | the area name  | heading text                                                    |
-| `show_name`   | `true`         | show the heading; `false` leaves only the summary               |
-| `images`      | none           | photos per plant: `{ <device_id>: /local/plants/monstera.jpg }` |
-| `photo_style` | `duotone`      | `duotone` or `natural`                                          |
-| `font`        | `design`       | `design` or `theme`                                             |
-| `tap_action`  | more-info      | applied to each plant                                           |
-| `hold_action` | log a watering | applied to each plant                                           |
+| Option        | Default        | Description                                                         |
+| ------------- | -------------- | ------------------------------------------------------------------- |
+| `area`        | none           | the area ID; `area` or `plants` is required                         |
+| `plants`      | none           | plant device IDs, shown along with the area's plants                |
+| `sort`        | `urgency`      | `urgency`, or `manual`: `plants` as listed, then the area's by name |
+| `layout`      | `list`         | `list` or `grid`                                                    |
+| `date_format` | `relative`     | `relative` or `absolute`                                            |
+| `title`       | the area name  | heading text; `Plants` without an area                              |
+| `show_name`   | `true`         | show the heading; `false` leaves only the summary                   |
+| `images`      | none           | photos per plant: `{ <device_id>: /local/plants/monstera.jpg }`     |
+| `photo_style` | `duotone`      | `duotone` or `natural`                                              |
+| `font`        | `design`       | `design` or `theme`                                                 |
+| `tap_action`  | more-info      | applied to each plant                                               |
+| `hold_action` | log a watering | applied to each plant                                               |
 
-Plants are sorted by what needs care first. Each plant responds to tap and hold like the plant card, and its Water and Feed chips log that care, as on the plant card.
+The card used to be called the area card: `custom:plant-care-area-card` still works and takes the same options.
+
+Plants are sorted by what needs care first, unless `sort: manual`. Each plant responds to tap and hold like the plant card, and its Water and Feed chips log that care, as on the plant card.
 
 ## Development
 
