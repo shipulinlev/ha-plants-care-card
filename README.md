@@ -1,3 +1,5 @@
+<p align="center"><img src="https://raw.githubusercontent.com/shipulinlev/ha-plants-care-card/main/docs/brand/icon.png" alt="Plant Care Cards icon" width="128"></p>
+
 # Plant Care Cards for Home Assistant
 
 Lovelace dashboard cards for the [Plant Care](https://github.com/shipulinlev/ha-plant-care) integration. One card shows a single plant's next watering and feeding. The other shows every plant in a room, the most urgent first.
