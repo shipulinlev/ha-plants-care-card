@@ -12,11 +12,13 @@ import { careStatus } from '../data/care';
 import { now } from '../data/clock';
 import { bindGestures, careActions, careKindAt, fireAction, plantActions } from './actions';
 import { GROUP_LAYOUTS, groupLayoutStyles, type GroupLayout } from './group/layouts';
-import { buildGroupView, type GroupView } from './group/view';
+import { buildGroupView, GROUP_SORTS, type GroupSort, type GroupView } from './group/view';
 import { localeChanged, statesChanged } from './update';
 
 export interface PlantCareGroupCardConfig extends LovelaceCardConfig {
-  area: string;
+  area?: string;
+  plants?: string[]; // device IDs, shown along with the area's plants
+  sort?: GroupSort;
   layout?: GroupLayout;
   date_format?: 'relative' | 'absolute';
   photo_style?: PhotoStyle;
@@ -30,6 +32,7 @@ export interface PlantCareGroupCardConfig extends LovelaceCardConfig {
 
 export const GROUP_DEFAULTS = {
   layout: 'list',
+  sort: 'urgency',
   date_format: 'relative',
   photo_style: 'duotone',
   font: 'design',
@@ -53,24 +56,33 @@ export class PlantCareGroupCard extends LitElement {
   private _unbind?: () => void;
 
   static getConfigElement(): HTMLElement {
-    return document.createElement('plant-care-area-card-editor');
+    return document.createElement('plant-care-group-card-editor');
   }
 
-  // The card picker's preview: the area with the most plants, ties by name.
+  // The card picker's preview: the area with the most plants, ties by name;
+  // without areas, the first plant.
   static getStubConfig(hass?: HomeAssistant): Partial<PlantCareGroupCardConfig> {
+    const plants = hass ? discoverPlants(hass) : [];
     const counts = new Map<string, number>();
-    for (const { areaId } of hass ? discoverPlants(hass) : []) {
+    for (const { areaId } of plants) {
       if (areaId && hass?.areas[areaId]) counts.set(areaId, (counts.get(areaId) ?? 0) + 1);
     }
     const name = (id: string) => hass?.areas[id]?.name ?? id;
     const [area] = [...counts].sort(([a, n], [b, m]) => m - n || name(a).localeCompare(name(b)));
-    return area ? { area: area[0], layout: 'list' } : { area: '' };
+    if (area) return { area: area[0], layout: 'list' };
+    return plants.length ? { plants: [plants[0].deviceId], layout: 'list' } : { area: '' };
   }
 
   setConfig(config: PlantCareGroupCardConfig): void {
-    if (!config.area) throw new Error('area is required');
+    if (!config.area && !config.plants?.length) throw new Error('area or plants is required');
+    if (config.plants && !Array.isArray(config.plants)) {
+      throw new Error('plants must be a list of device IDs');
+    }
     if (config.layout && !(config.layout in GROUP_LAYOUTS)) {
       throw new Error(`layout must be one of: ${Object.keys(GROUP_LAYOUTS).join(', ')}`);
+    }
+    if (config.sort && !GROUP_SORTS.includes(config.sort)) {
+      throw new Error(`sort must be one of: ${GROUP_SORTS.join(', ')}`);
     }
     this._config = { ...GROUP_DEFAULTS, ...config };
     this._view = undefined;
@@ -124,7 +136,7 @@ export class PlantCareGroupCard extends LitElement {
     if (actions) fireAction(this, actions, 'tap');
   };
 
-  // Only this area's plants, the registries (plants can move) and the locale matter.
+  // Only this group's plants, the registries (plants can move), its area and the locale matter.
   protected shouldUpdate(changed: PropertyValues<this>): boolean {
     if (!changed.has('hass') || changed.size > 1) return true;
     const prev = changed.get('hass') as HomeAssistant | undefined;
@@ -134,7 +146,7 @@ export class PlantCareGroupCard extends LitElement {
     return (
       prev.entities !== hass.entities ||
       prev.devices !== hass.devices ||
-      prev.areas[area] !== hass.areas[area] ||
+      (!!area && prev.areas[area] !== hass.areas[area]) ||
       localeChanged(prev, hass) ||
       statesChanged(
         prev,
@@ -158,7 +170,7 @@ export class PlantCareGroupCard extends LitElement {
       const t = createLocalize(this.hass.locale.language);
       return html`<ha-card>
         ${corners()}
-        <div class="warning-text">${t('area_not_found', { name: this._config.area })}</div>
+        <div class="warning-text">${t('area_not_found', { name: this._config.area ?? '' })}</div>
       </ha-card>`;
     }
     return html`<ha-card>
@@ -178,3 +190,7 @@ export class PlantCareGroupCard extends LitElement {
     `,
   ];
 }
+
+// The card's former name, kept so existing dashboards keep working. A constructor
+// can be registered under one tag only, hence the empty subclass.
+export class PlantCareAreaCard extends PlantCareGroupCard {}

@@ -115,3 +115,14 @@ export function plantByDevice(hass: Hass, deviceId: string): Plant | undefined {
 export function plantsInArea(hass: Hass, areaId: string): Plant[] {
   return discoverPlants(hass).filter((p) => p.areaId === areaId);
 }
+
+// Picked plants in the given order, then the area's plants not picked already.
+// Picked devices that are no longer plants are skipped.
+export function plantsInGroup(hass: Hass, group: { area?: string; plants?: string[] }): Plant[] {
+  const all = discoverPlants(hass);
+  const picked = [...new Set(group.plants ?? [])]
+    .map((id) => all.find((p) => p.deviceId === id))
+    .filter((p): p is Plant => !!p);
+  const inArea = group.area ? all.filter((p) => p.areaId === group.area) : [];
+  return [...picked, ...inArea.filter((p) => !picked.includes(p))];
+}

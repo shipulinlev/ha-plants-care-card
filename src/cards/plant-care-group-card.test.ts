@@ -4,10 +4,15 @@ import { createMockHass, TODAY } from '../../dev/mock-hass';
 import { setClock } from '../data/clock';
 import type { HomeAssistant } from '../types/hass';
 import { HOLD_MS } from './actions';
-import { PlantCareGroupCard, type PlantCareGroupCardConfig } from './plant-care-group-card';
+import {
+  PlantCareAreaCard,
+  PlantCareGroupCard,
+  type PlantCareGroupCardConfig,
+} from './plant-care-group-card';
 
-if (!customElements.get('plant-care-area-card')) {
-  customElements.define('plant-care-area-card', PlantCareGroupCard);
+if (!customElements.get('plant-care-group-card')) {
+  customElements.define('plant-care-group-card', PlantCareGroupCard);
+  customElements.define('plant-care-area-card', PlantCareAreaCard);
 }
 
 beforeAll(() => setClock(() => TODAY));
@@ -17,9 +22,13 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-async function mount(config: Partial<PlantCareGroupCardConfig>, hass = createMockHass()) {
-  const card = document.createElement('plant-care-area-card') as PlantCareGroupCard;
-  card.setConfig({ type: 'custom:plant-care-area-card', area: 'living_room', ...config });
+async function mount(
+  config: Partial<PlantCareGroupCardConfig>,
+  hass = createMockHass(),
+  tag = 'plant-care-group-card',
+) {
+  const card = document.createElement(tag) as PlantCareGroupCard;
+  card.setConfig({ type: 'custom:plant-care-group-card', area: 'living_room', ...config });
   card.hass = hass;
   document.body.append(card);
   await card.updateComplete;
@@ -105,12 +114,20 @@ describe('states and config', () => {
     expect(text('.warning-text')).toBe('Area not found: nope');
   });
 
-  it('rejects a missing area and an unknown layout', () => {
+  it('says so when none of the picked plants exist', async () => {
+    const { text } = await mount({ area: undefined, plants: ['nope'] });
+    expect(text('.empty')).toBe('No plants selected');
+  });
+
+  it('rejects neither an area nor plants, an unknown layout and an unknown sort', () => {
     const card = new PlantCareGroupCard();
-    expect(() => card.setConfig({ type: 'x', area: '' })).toThrow('area');
+    expect(() => card.setConfig({ type: 'x', area: '' })).toThrow('area or plants');
+    expect(() => card.setConfig({ type: 'x', plants: [] })).toThrow('area or plants');
+    expect(() => card.setConfig({ type: 'x', plants: 'device_ficus' as never })).toThrow('list');
     expect(() => card.setConfig({ type: 'x', area: 'a', layout: 'nope' as never })).toThrow(
       'layout',
     );
+    expect(() => card.setConfig({ type: 'x', area: 'a', sort: 'nope' as never })).toThrow('sort');
   });
 
   it('sizes the card by plant count', async () => {
@@ -205,6 +222,14 @@ describe('updates', () => {
     expect(all('.row.plant')[2].querySelector('.tag')!.className).toBe('tag due chip');
   });
 
+  it('re-renders for a picked plant outside the area', async () => {
+    const { card, all } = await mount({ plants: ['device_calathea'] });
+    card.hass = withState(card.hass!, 'sensor.calathea_watering_status', 'overdue');
+    await card.updateComplete;
+    const calathea = all('.row.plant').find((r) => r.textContent!.includes('Calathea'))!;
+    expect(calathea.querySelector('.tag')!.className).toBe('tag overdue chip');
+  });
+
   it('adds a plant moved into the area', async () => {
     const { card, all } = await mount({});
     const hass = card.hass!;
@@ -227,7 +252,44 @@ describe('card picker', () => {
     expect(PlantCareGroupCard.getStubConfig({ ...hass, entities: {} })).toEqual({ area: '' });
   });
 
+  it('previews the first plant when no plant has an area', () => {
+    const hass = createMockHass();
+    expect(PlantCareGroupCard.getStubConfig({ ...hass, areas: {} })).toMatchObject({
+      plants: [expect.any(String)],
+    });
+  });
+
   it('opens its editor', () => {
-    expect(PlantCareGroupCard.getConfigElement().tagName).toBe('PLANT-CARE-AREA-CARD-EDITOR');
+    expect(PlantCareGroupCard.getConfigElement().tagName).toBe('PLANT-CARE-GROUP-CARD-EDITOR');
+  });
+});
+
+describe('picked plants', () => {
+  const names = (rows: Element[]) => rows.map((r) => r.querySelector('.row-name')!.textContent);
+
+  it('shows only the picked plants, titled "Plants"', async () => {
+    const { text, all } = await mount({
+      area: undefined,
+      plants: ['device_monstera', 'device_calathea'],
+    });
+    expect(text('.area-title .label')).toBe('Group');
+    expect(text('.area-name')).toBe('Plants');
+    expect(names(all('.row.plant'))).toEqual(['Calathea', 'Monstera']);
+  });
+
+  it('keeps the picked order with sort: manual', async () => {
+    const { all } = await mount({
+      area: 'bedroom',
+      plants: ['device_snake', 'device_monstera'],
+      sort: 'manual',
+    });
+    expect(names(all('.row.plant'))).toEqual(['Snake plant', 'Monstera', 'Calathea']);
+  });
+});
+
+describe('former name', () => {
+  it('still renders as plant-care-area-card', async () => {
+    const { all } = await mount({}, createMockHass(), 'plant-care-area-card');
+    expect(all('.row.plant')).toHaveLength(4);
   });
 });

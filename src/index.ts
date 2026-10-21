@@ -1,5 +1,5 @@
 import { PlantCareGroupCardEditor } from './cards/group/editor';
-import { PlantCareGroupCard } from './cards/plant-care-group-card';
+import { PlantCareAreaCard, PlantCareGroupCard } from './cards/plant-care-group-card';
 import { PlantCareCard } from './cards/plant-care-card';
 import { PlantCareCardEditor } from './cards/plant/editor';
 import { suggestPlantCard } from './cards/suggest';
@@ -26,9 +26,10 @@ const define = (tag: string, ctor: CustomElementConstructor) => {
 };
 
 define('plant-care-card', PlantCareCard);
-define('plant-care-area-card', PlantCareGroupCard);
+define('plant-care-group-card', PlantCareGroupCard);
+define('plant-care-area-card', PlantCareAreaCard); // former name
 define('plant-care-card-editor', PlantCareCardEditor);
-define('plant-care-area-card-editor', PlantCareGroupCardEditor);
+define('plant-care-group-card-editor', PlantCareGroupCardEditor);
 
 const DOCS = 'https://github.com/shipulinlev/ha-plants-care-card#readme';
 
@@ -43,9 +44,9 @@ window.customCards.push(
     getEntitySuggestion: suggestPlantCard,
   },
   {
-    type: 'plant-care-area-card',
-    name: 'Plant Care Area',
-    description: 'Every plant in an area, most urgent first.',
+    type: 'plant-care-group-card',
+    name: 'Plant Care Group',
+    description: 'Plants from an area or ones you pick, most urgent first.',
     preview: true,
     documentationURL: DOCS,
   },

@@ -1,14 +1,19 @@
-import { groupSummary, careView, sortByUrgency, type CareView } from '../../data/care';
+import { careView, groupSummary, sortByUrgency, type CareView } from '../../data/care';
 import { now } from '../../data/clock';
-import { plantsInArea } from '../../data/discover';
+import { plantsInGroup } from '../../data/discover';
 import type { Plant } from '../../data/model';
 import { resolveTimeZone } from '../../data/time';
 import { createLocalize, type Localize } from '../../localize/localize';
 import type { PhotoStyle } from '../../styles';
 import type { HomeAssistant } from '../../types/hass';
 
+export const GROUP_SORTS = ['urgency', 'manual'] as const;
+export type GroupSort = (typeof GROUP_SORTS)[number];
+
 export interface GroupViewConfig {
-  area: string;
+  area?: string;
+  plants?: string[]; // device IDs
+  sort?: GroupSort;
   date_format?: 'relative' | 'absolute';
   title?: string;
   show_name?: boolean;
@@ -25,22 +30,33 @@ export interface GroupPlantView {
   feed: CareView;
 }
 
-// Everything an area layout renders. Layouts are pure templates over this.
+// Everything a group layout renders. Layouts are pure templates over this.
 export interface GroupView {
+  label: string; // above the title: "Area", or "Group" without one
   title: string | null; // null when the name is hidden
   countText: string;
   attentionText: string;
-  plants: GroupPlantView[]; // most urgent first
+  emptyText: string;
+  plants: GroupPlantView[]; // most urgent first, or in the picked order
   t: Localize;
 }
 
-// null when the area does not exist.
+// Manual order: the picked plants as listed, then the area's other plants by name.
+function manualOrder(plants: Plant[], picked: string[], language: string): Plant[] {
+  const first = plants.filter((p) => picked.includes(p.deviceId));
+  const rest = plants
+    .filter((p) => !picked.includes(p.deviceId))
+    .sort((a, b) => a.name.localeCompare(b.name, language));
+  return [...first, ...rest];
+}
+
+// null when the configured area does not exist.
 export function buildGroupView(
   hass: Pick<HomeAssistant, 'states' | 'entities' | 'devices' | 'areas' | 'config' | 'locale'>,
   config: GroupViewConfig,
 ): GroupView | null {
-  const area = hass.areas[config.area];
-  if (!area) return null;
+  const area = config.area ? hass.areas[config.area] : undefined;
+  if (config.area && !area) return null;
   const language = hass.locale.language;
   const t = createLocalize(language);
   const ctx = {
@@ -51,12 +67,18 @@ export function buildGroupView(
     dateFormat: config.date_format ?? 'relative',
     showInterval: false,
   };
-  const plants = sortByUrgency(plantsInArea(hass, config.area), ctx);
+  const group = plantsInGroup(hass, config);
+  const plants =
+    config.sort === 'manual'
+      ? manualOrder(group, config.plants ?? [], language)
+      : sortByUrgency(group, ctx);
   const { countText, attentionText } = groupSummary(plants, t, ctx.now);
   return {
-    title: config.show_name === false ? null : config.title || area.name,
+    label: area ? t('area') : t('group'),
+    title: config.show_name === false ? null : config.title || area?.name || t('plants'),
     countText,
     attentionText,
+    emptyText: area ? t('no_plants') : t('no_plants_selected'),
     plants: plants.map((plant) => ({
       plant,
       name: plant.name,

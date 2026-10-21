@@ -46,7 +46,37 @@ describe('buildGroupView', () => {
   });
 
   it('is empty for an area without plants and null for a missing one', () => {
-    expect(buildGroupView(hass, { area: 'office' })!.plants).toEqual([]);
+    const office = buildGroupView(hass, { area: 'office' })!;
+    expect([office.plants, office.emptyText]).toEqual([[], 'No plants in this area']);
     expect(buildGroupView(hass, { area: 'nope' })).toBeNull();
+    expect(buildGroupView(hass, { area: 'nope', plants: ['device_ficus'] })).toBeNull();
+  });
+
+  it('adds picked plants to the area and sorts them all by urgency', () => {
+    const v = buildGroupView(hass, { area: 'bedroom', plants: ['device_snake', 'device_ficus'] })!;
+    expect(v.title).toBe('Bedroom');
+    expect(v.plants.map((p) => p.name)).toEqual(['Fiddle-leaf fig', 'Calathea', 'Snake plant']);
+  });
+
+  it('keeps the picked order, then the area plants by name, with sort: manual', () => {
+    const v = buildGroupView(hass, {
+      area: 'living_room',
+      plants: ['device_snake', 'device_calathea'],
+      sort: 'manual',
+    })!;
+    expect(v.plants.map((p) => p.name)).toEqual([
+      'Snake plant',
+      'Calathea',
+      'Fiddle-leaf fig',
+      'Monstera',
+      'Pothos',
+    ]);
+  });
+
+  it('titles a group without an area "Plants", unless titled', () => {
+    expect(buildGroupView(hass, { plants: ['device_ficus'] })!.title).toBe('Plants');
+    expect(buildGroupView(hass, { plants: ['device_ficus'], title: 'Herbs' })!.title).toBe('Herbs');
+    const missing = buildGroupView(hass, { plants: ['nope'] })!;
+    expect([missing.plants, missing.emptyText]).toEqual([[], 'No plants selected']);
   });
 });

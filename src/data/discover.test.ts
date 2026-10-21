@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { createMockHass } from '../../dev/mock-hass';
 import type { HassEntityRegistryEntry, HomeAssistant } from '../types/hass';
-import { discoverPlants, plantByDevice, plantEntityIds, plantsInArea } from './discover';
+import {
+  discoverPlants,
+  plantByDevice,
+  plantEntityIds,
+  plantsInArea,
+  plantsInGroup,
+} from './discover';
 
 // A one-plant hass; `edit` tweaks it before discovery.
 function singlePlant(edit: (hass: HomeAssistant) => void = () => {}): HomeAssistant {
@@ -164,5 +170,28 @@ describe('plantByDevice / plantsInArea', () => {
     expect(plantsInArea(hass, 'bedroom').map((p) => p.name)).toEqual(['Calathea']);
     expect(plantsInArea(hass, 'living_room')).toHaveLength(4);
     expect(plantsInArea(hass, 'nope')).toEqual([]);
+  });
+});
+
+describe('plantsInGroup', () => {
+  const hass = createMockHass();
+  const names = (group: Parameters<typeof plantsInGroup>[1]) =>
+    plantsInGroup(hass, group).map((p) => p.name);
+
+  it('keeps the picked order and skips devices that are not plants', () => {
+    expect(names({ plants: ['device_ficus', 'nope', 'device_monstera', 'device_ficus'] })).toEqual([
+      'Fiddle-leaf fig',
+      'Monstera',
+    ]);
+  });
+
+  it('adds the area plants after the picked ones, once each', () => {
+    const group = names({ area: 'living_room', plants: ['device_calathea', 'device_monstera'] });
+    expect(group.slice(0, 2)).toEqual(['Calathea', 'Monstera']);
+    expect(group).toHaveLength(5);
+  });
+
+  it('is empty with neither an area nor plants', () => {
+    expect(names({})).toEqual([]);
   });
 });

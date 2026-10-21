@@ -15,7 +15,7 @@ const plant = (device: string, layout = 'header', extra: Partial<LovelaceCardCon
 });
 
 const area = (id: string, layout = 'list', extra: Partial<LovelaceCardConfig> = {}) => ({
-  type: 'plant-care-area-card',
+  type: 'plant-care-group-card',
   area: id,
   layout,
   ...extra,
@@ -57,12 +57,27 @@ const SAMPLES: Array<{ id: string; label: string; config: LovelaceCardConfig }> 
   {
     id: '1e',
     label: 'Area list',
-    config: { type: 'plant-care-area-card', area: 'living_room', layout: 'list' },
+    config: { type: 'plant-care-group-card', area: 'living_room', layout: 'list' },
   },
   {
     id: '1f',
     label: 'Area grid',
-    config: { type: 'plant-care-area-card', area: 'living_room', layout: 'grid' },
+    config: { type: 'plant-care-group-card', area: 'living_room', layout: 'grid' },
+  },
+  {
+    id: 'x-group-picked',
+    label: 'Group of picked plants, grid',
+    config: {
+      type: 'plant-care-group-card',
+      plants: ['device_calathea', 'device_fern', 'device_snake'],
+      title: 'Favourites',
+      layout: 'grid',
+    },
+  },
+  {
+    id: 'x-group-manual',
+    label: 'Area + picked plants, manual order',
+    config: area('bedroom', 'list', { plants: ['device_snake', 'device_ficus'], sort: 'manual' }),
   },
   {
     id: 'x-area-photo',
@@ -72,6 +87,11 @@ const SAMPLES: Array<{ id: string; label: string; config: LovelaceCardConfig }> 
   { id: 'x-area-unknown', label: 'Area, no care logged', config: area('kitchen', 'grid') },
   { id: 'x-area-empty', label: 'Empty area', config: area('office') },
   { id: 'x-area-missing', label: 'Missing area', config: area('nope') },
+  {
+    id: 'x-area-alias',
+    label: 'Former name: plant-care-area-card',
+    config: { ...area('living_room'), type: 'plant-care-area-card' },
+  },
 ];
 
 const hass = createMockHass();

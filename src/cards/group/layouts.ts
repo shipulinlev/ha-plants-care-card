@@ -7,7 +7,7 @@ import type { GroupPlantView, GroupView } from './view';
 // its care chips carry data-care.
 
 const empty = (v: GroupView) =>
-  v.plants.length ? nothing : html`<div class="empty muted">${v.t('no_plants')}</div>`;
+  v.plants.length ? nothing : html`<div class="empty muted">${v.emptyText}</div>`;
 
 const row = (p: GroupPlantView) => html`
   <div
@@ -33,7 +33,7 @@ export const list = (v: GroupView) => html`
       v.title === null
         ? nothing
         : html`<div class="area-title">
-            <div class="label muted">${v.t('area')}</div>
+            <div class="label muted">${v.label}</div>
             <h2 class="heading area-name">${v.title}</h2>
           </div>`
     }
