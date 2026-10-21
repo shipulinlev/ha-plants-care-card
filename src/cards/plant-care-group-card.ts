@@ -11,13 +11,13 @@ import type {
 import { careStatus } from '../data/care';
 import { now } from '../data/clock';
 import { bindGestures, careActions, careKindAt, fireAction, plantActions } from './actions';
-import { AREA_LAYOUTS, areaLayoutStyles, type AreaLayout } from './area/layouts';
-import { buildAreaView, type AreaView } from './area/view';
+import { GROUP_LAYOUTS, groupLayoutStyles, type GroupLayout } from './group/layouts';
+import { buildGroupView, type GroupView } from './group/view';
 import { localeChanged, statesChanged } from './update';
 
-export interface PlantCareAreaCardConfig extends LovelaceCardConfig {
+export interface PlantCareGroupCardConfig extends LovelaceCardConfig {
   area: string;
-  layout?: AreaLayout;
+  layout?: GroupLayout;
   date_format?: 'relative' | 'absolute';
   photo_style?: PhotoStyle;
   font?: FontMode;
@@ -28,17 +28,17 @@ export interface PlantCareAreaCardConfig extends LovelaceCardConfig {
   hold_action?: ActionConfig;
 }
 
-export const AREA_DEFAULTS = {
+export const GROUP_DEFAULTS = {
   layout: 'list',
   date_format: 'relative',
   photo_style: 'duotone',
   font: 'design',
   show_name: true,
-} satisfies Partial<PlantCareAreaCardConfig>;
+} satisfies Partial<PlantCareGroupCardConfig>;
 
 const TICK_MS = 60_000;
 
-export class PlantCareAreaCard extends LitElement {
+export class PlantCareGroupCard extends LitElement {
   static properties = {
     hass: { attribute: false },
     _config: { state: true },
@@ -46,9 +46,9 @@ export class PlantCareAreaCard extends LitElement {
   };
 
   hass?: HomeAssistant;
-  private _config?: PlantCareAreaCardConfig;
+  private _config?: PlantCareGroupCardConfig;
   private _tick = 0;
-  private _view?: AreaView | null;
+  private _view?: GroupView | null;
   private _timer?: ReturnType<typeof setInterval>;
   private _unbind?: () => void;
 
@@ -57,7 +57,7 @@ export class PlantCareAreaCard extends LitElement {
   }
 
   // The card picker's preview: the area with the most plants, ties by name.
-  static getStubConfig(hass?: HomeAssistant): Partial<PlantCareAreaCardConfig> {
+  static getStubConfig(hass?: HomeAssistant): Partial<PlantCareGroupCardConfig> {
     const counts = new Map<string, number>();
     for (const { areaId } of hass ? discoverPlants(hass) : []) {
       if (areaId && hass?.areas[areaId]) counts.set(areaId, (counts.get(areaId) ?? 0) + 1);
@@ -67,12 +67,12 @@ export class PlantCareAreaCard extends LitElement {
     return area ? { area: area[0], layout: 'list' } : { area: '' };
   }
 
-  setConfig(config: PlantCareAreaCardConfig): void {
+  setConfig(config: PlantCareGroupCardConfig): void {
     if (!config.area) throw new Error('area is required');
-    if (config.layout && !(config.layout in AREA_LAYOUTS)) {
-      throw new Error(`layout must be one of: ${Object.keys(AREA_LAYOUTS).join(', ')}`);
+    if (config.layout && !(config.layout in GROUP_LAYOUTS)) {
+      throw new Error(`layout must be one of: ${Object.keys(GROUP_LAYOUTS).join(', ')}`);
     }
-    this._config = { ...AREA_DEFAULTS, ...config };
+    this._config = { ...GROUP_DEFAULTS, ...config };
     this._view = undefined;
     applyFontMode(this, this._config.font ?? 'design');
   }
@@ -147,7 +147,7 @@ export class PlantCareAreaCard extends LitElement {
   protected willUpdate(): void {
     if (this.hass && this._config) {
       void this._tick; // the minute tick rebuilds the view, so relative dates roll over
-      this._view = buildAreaView(this.hass, this._config);
+      this._view = buildGroupView(this.hass, this._config);
     }
   }
 
@@ -162,13 +162,13 @@ export class PlantCareAreaCard extends LitElement {
       </ha-card>`;
     }
     return html`<ha-card>
-      ${corners()} ${AREA_LAYOUTS[this._config.layout ?? 'list'](view)}
+      ${corners()} ${GROUP_LAYOUTS[this._config.layout ?? 'list'](view)}
     </ha-card>`;
   }
 
   static styles = [
     sharedStyles,
-    areaLayoutStyles,
+    groupLayoutStyles,
     css`
       .warning-text {
         padding: 16px 18px;

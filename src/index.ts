@@ -1,5 +1,5 @@
-import { PlantCareAreaCardEditor } from './cards/area/editor';
-import { PlantCareAreaCard } from './cards/plant-care-area-card';
+import { PlantCareGroupCardEditor } from './cards/group/editor';
+import { PlantCareGroupCard } from './cards/plant-care-group-card';
 import { PlantCareCard } from './cards/plant-care-card';
 import { PlantCareCardEditor } from './cards/plant/editor';
 import { suggestPlantCard } from './cards/suggest';
@@ -26,9 +26,9 @@ const define = (tag: string, ctor: CustomElementConstructor) => {
 };
 
 define('plant-care-card', PlantCareCard);
-define('plant-care-area-card', PlantCareAreaCard);
+define('plant-care-area-card', PlantCareGroupCard);
 define('plant-care-card-editor', PlantCareCardEditor);
-define('plant-care-area-card-editor', PlantCareAreaCardEditor);
+define('plant-care-area-card-editor', PlantCareGroupCardEditor);
 
 const DOCS = 'https://github.com/shipulinlev/ha-plants-care-card#readme';
 

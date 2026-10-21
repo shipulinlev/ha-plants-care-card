@@ -197,7 +197,7 @@ export function needsCare(plant: Plant, now: Date): boolean {
     .some((s) => s === 'due' || s === 'overdue');
 }
 
-export function areaSummary(
+export function groupSummary(
   plants: Plant[],
   t: Localize,
   now: Date,

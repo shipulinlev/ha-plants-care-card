@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createMockHass, TODAY } from '../../dev/mock-hass';
 import { createLocalize } from '../localize/localize';
 import {
-  areaSummary,
+  groupSummary,
   careStatus,
   careView,
   liveStatus,
@@ -265,7 +265,7 @@ describe('urgency and sorting', () => {
   });
 });
 
-describe('needsCare and areaSummary', () => {
+describe('needsCare and groupSummary', () => {
   const withStatus = (water: CareStatus | null, feed: CareStatus | null) =>
     plant('p', care(5, { status: water }), care(5, { status: feed }));
   const t = createLocalize('en');
@@ -282,15 +282,15 @@ describe('needsCare and areaSummary', () => {
   });
 
   it('summarises an area', () => {
-    expect(areaSummary([withStatus('ok', 'ok')], t, NOW)).toEqual({
+    expect(groupSummary([withStatus('ok', 'ok')], t, NOW)).toEqual({
       countText: '1 plant',
       attentionText: 'All on schedule',
     });
-    expect(areaSummary([withStatus('due', 'ok'), withStatus('ok', 'ok')], t, NOW)).toEqual({
+    expect(groupSummary([withStatus('due', 'ok'), withStatus('ok', 'ok')], t, NOW)).toEqual({
       countText: '2 plants',
       attentionText: '1 needs care today',
     });
-    expect(areaSummary([withStatus('due', 'ok'), withStatus('overdue', 'ok')], t, NOW)).toEqual({
+    expect(groupSummary([withStatus('due', 'ok'), withStatus('overdue', 'ok')], t, NOW)).toEqual({
       countText: '2 plants',
       attentionText: '2 need care today',
     });
@@ -298,6 +298,6 @@ describe('needsCare and areaSummary', () => {
 
   it('counts the mock living room like the design', () => {
     const living = discoverPlants(createMockHass()).filter((p) => p.areaId === 'living_room');
-    expect(areaSummary(living, t, TODAY).attentionText).toBe('1 needs care today');
+    expect(groupSummary(living, t, TODAY).attentionText).toBe('1 needs care today');
   });
 });

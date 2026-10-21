@@ -1,12 +1,12 @@
 import type { Localize, TranslationKey } from '../../localize/localize';
 import type { HaFormSchema } from '../../types/hass';
 import { actionFields, PlantCareEditor, section, select } from '../editor';
-import { AREA_DEFAULTS, type PlantCareAreaCardConfig } from '../plant-care-area-card';
-import { AREA_LAYOUTS } from './layouts';
+import { GROUP_DEFAULTS, type PlantCareGroupCardConfig } from '../plant-care-group-card';
+import { GROUP_LAYOUTS } from './layouts';
 
 // `images` (per-plant photos) stays YAML-only; the editor keeps it untouched.
-export class PlantCareAreaCardEditor extends PlantCareEditor<PlantCareAreaCardConfig> {
-  protected defaults = AREA_DEFAULTS;
+export class PlantCareGroupCardEditor extends PlantCareEditor<PlantCareGroupCardConfig> {
+  protected defaults = GROUP_DEFAULTS;
   protected helpers: Record<string, TranslationKey> = { photo_style: 'editor.images_helper' };
 
   protected schema(t: Localize): HaFormSchema[] {
@@ -22,7 +22,7 @@ export class PlantCareAreaCardEditor extends PlantCareEditor<PlantCareAreaCardCo
         type: 'grid',
         name: '',
         schema: [
-          select(t, 'layout', Object.keys(AREA_LAYOUTS)),
+          select(t, 'layout', Object.keys(GROUP_LAYOUTS)),
           select(t, 'date_format', ['relative', 'absolute']),
         ],
       },

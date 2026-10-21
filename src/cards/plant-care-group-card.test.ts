@@ -4,10 +4,10 @@ import { createMockHass, TODAY } from '../../dev/mock-hass';
 import { setClock } from '../data/clock';
 import type { HomeAssistant } from '../types/hass';
 import { HOLD_MS } from './actions';
-import { PlantCareAreaCard, type PlantCareAreaCardConfig } from './plant-care-area-card';
+import { PlantCareGroupCard, type PlantCareGroupCardConfig } from './plant-care-group-card';
 
 if (!customElements.get('plant-care-area-card')) {
-  customElements.define('plant-care-area-card', PlantCareAreaCard);
+  customElements.define('plant-care-area-card', PlantCareGroupCard);
 }
 
 beforeAll(() => setClock(() => TODAY));
@@ -17,8 +17,8 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-async function mount(config: Partial<PlantCareAreaCardConfig>, hass = createMockHass()) {
-  const card = document.createElement('plant-care-area-card') as PlantCareAreaCard;
+async function mount(config: Partial<PlantCareGroupCardConfig>, hass = createMockHass()) {
+  const card = document.createElement('plant-care-area-card') as PlantCareGroupCard;
   card.setConfig({ type: 'custom:plant-care-area-card', area: 'living_room', ...config });
   card.hass = hass;
   document.body.append(card);
@@ -106,7 +106,7 @@ describe('states and config', () => {
   });
 
   it('rejects a missing area and an unknown layout', () => {
-    const card = new PlantCareAreaCard();
+    const card = new PlantCareGroupCard();
     expect(() => card.setConfig({ type: 'x', area: '' })).toThrow('area');
     expect(() => card.setConfig({ type: 'x', area: 'a', layout: 'nope' as never })).toThrow(
       'layout',
@@ -223,11 +223,11 @@ describe('updates', () => {
 describe('card picker', () => {
   it('previews the area with the most plants', () => {
     const hass = createMockHass();
-    expect(PlantCareAreaCard.getStubConfig(hass)).toEqual({ area: 'living_room', layout: 'list' });
-    expect(PlantCareAreaCard.getStubConfig({ ...hass, entities: {} })).toEqual({ area: '' });
+    expect(PlantCareGroupCard.getStubConfig(hass)).toEqual({ area: 'living_room', layout: 'list' });
+    expect(PlantCareGroupCard.getStubConfig({ ...hass, entities: {} })).toEqual({ area: '' });
   });
 
   it('opens its editor', () => {
-    expect(PlantCareAreaCard.getConfigElement().tagName).toBe('PLANT-CARE-AREA-CARD-EDITOR');
+    expect(PlantCareGroupCard.getConfigElement().tagName).toBe('PLANT-CARE-AREA-CARD-EDITOR');
   });
 });

@@ -2,10 +2,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createMockHass } from '../../../dev/mock-hass';
 import type { HaFormSchema, LovelaceCardConfig } from '../../types/hass';
-import { PlantCareAreaCardEditor } from './editor';
+import { PlantCareGroupCardEditor } from './editor';
 
 if (!customElements.get('plant-care-area-card-editor')) {
-  customElements.define('plant-care-area-card-editor', PlantCareAreaCardEditor);
+  customElements.define('plant-care-area-card-editor', PlantCareGroupCardEditor);
 }
 
 afterEach(() => document.body.replaceChildren());
@@ -17,7 +17,7 @@ type Form = HTMLElement & {
 };
 
 async function mount(config: Record<string, unknown>) {
-  const editor = document.createElement('plant-care-area-card-editor') as PlantCareAreaCardEditor;
+  const editor = document.createElement('plant-care-area-card-editor') as PlantCareGroupCardEditor;
   editor.hass = createMockHass();
   editor.setConfig({ type: 'custom:plant-care-area-card', ...config } as never);
   document.body.append(editor);

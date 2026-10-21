@@ -1,15 +1,15 @@
 import { css, html, nothing } from 'lit';
 import { careButton, careIcon, plantPhoto } from '../../styles';
-import type { AreaPlantView, AreaView } from './view';
+import type { GroupPlantView, GroupView } from './view';
 
 // Layouts 1e/1f from docs/design/Plant Card.dc.html (pixel specs in docs/design/README.md).
 // Each plant carries data-device so the card's single gesture listener can find it;
 // its care chips carry data-care.
 
-const empty = (v: AreaView) =>
+const empty = (v: GroupView) =>
   v.plants.length ? nothing : html`<div class="empty muted">${v.t('no_plants')}</div>`;
 
-const row = (p: AreaPlantView) => html`
+const row = (p: GroupPlantView) => html`
   <div
     class="row plant"
     data-device=${p.plant.deviceId}
@@ -27,7 +27,7 @@ const row = (p: AreaPlantView) => html`
 `;
 
 // 1e: list, most urgent first.
-export const list = (v: AreaView) => html`
+export const list = (v: GroupView) => html`
   <div class="area-head">
     ${
       v.title === null
@@ -50,7 +50,7 @@ export const list = (v: AreaView) => html`
   }
 `;
 
-const cell = (p: AreaPlantView, i: number) => html`
+const cell = (p: GroupPlantView, i: number) => html`
   <div
     class="cell plant ${i % 2 ? 'right' : ''} ${i > 1 ? 'lower' : ''}"
     data-device=${p.plant.deviceId}
@@ -74,7 +74,7 @@ const cell = (p: AreaPlantView, i: number) => html`
 `;
 
 // 1f: two-column grid of plant cells.
-export const grid = (v: AreaView) => html`
+export const grid = (v: GroupView) => html`
   <div class="area-head bordered">
     ${v.title === null ? nothing : html`<h2 class="heading area-name">${v.title}</h2>`}
     <div class="summary">${v.attentionText}</div>
@@ -82,10 +82,10 @@ export const grid = (v: AreaView) => html`
   ${v.plants.length ? html`<div class="cells">${v.plants.map(cell)}</div>` : empty(v)}
 `;
 
-export const AREA_LAYOUTS = { list, grid };
-export type AreaLayout = keyof typeof AREA_LAYOUTS;
+export const GROUP_LAYOUTS = { list, grid };
+export type GroupLayout = keyof typeof GROUP_LAYOUTS;
 
-export const areaLayoutStyles = css`
+export const groupLayoutStyles = css`
   h2 {
     margin: 0;
   }

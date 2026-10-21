@@ -1,4 +1,4 @@
-import { areaSummary, careView, sortByUrgency, type CareView } from '../../data/care';
+import { groupSummary, careView, sortByUrgency, type CareView } from '../../data/care';
 import { now } from '../../data/clock';
 import { plantsInArea } from '../../data/discover';
 import type { Plant } from '../../data/model';
@@ -7,7 +7,7 @@ import { createLocalize, type Localize } from '../../localize/localize';
 import type { PhotoStyle } from '../../styles';
 import type { HomeAssistant } from '../../types/hass';
 
-export interface AreaViewConfig {
+export interface GroupViewConfig {
   area: string;
   date_format?: 'relative' | 'absolute';
   title?: string;
@@ -16,7 +16,7 @@ export interface AreaViewConfig {
   photo_style?: PhotoStyle;
 }
 
-export interface AreaPlantView {
+export interface GroupPlantView {
   plant: Plant;
   name: string;
   species: string | null;
@@ -26,19 +26,19 @@ export interface AreaPlantView {
 }
 
 // Everything an area layout renders. Layouts are pure templates over this.
-export interface AreaView {
+export interface GroupView {
   title: string | null; // null when the name is hidden
   countText: string;
   attentionText: string;
-  plants: AreaPlantView[]; // most urgent first
+  plants: GroupPlantView[]; // most urgent first
   t: Localize;
 }
 
 // null when the area does not exist.
-export function buildAreaView(
+export function buildGroupView(
   hass: Pick<HomeAssistant, 'states' | 'entities' | 'devices' | 'areas' | 'config' | 'locale'>,
-  config: AreaViewConfig,
-): AreaView | null {
+  config: GroupViewConfig,
+): GroupView | null {
   const area = hass.areas[config.area];
   if (!area) return null;
   const language = hass.locale.language;
@@ -52,7 +52,7 @@ export function buildAreaView(
     showInterval: false,
   };
   const plants = sortByUrgency(plantsInArea(hass, config.area), ctx);
-  const { countText, attentionText } = areaSummary(plants, t, ctx.now);
+  const { countText, attentionText } = groupSummary(plants, t, ctx.now);
   return {
     title: config.show_name === false ? null : config.title || area.name,
     countText,
