@@ -1,6 +1,6 @@
 {
   "name": "ha-plants-care-card",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Lovelace cards for the plant_care Home Assistant integration",
   "type": "module",
   "private": true,
