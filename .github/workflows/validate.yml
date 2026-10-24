@@ -1,7 +1,7 @@
 name: Validate
 
-# HACS finds the card in the latest release's assets (dist/ is not committed), so validate
-# after the Release workflow has attached it, on demand, and nightly once a release exists.
+# HACS finds the card in dist/ at the latest release tag, so validate
+# after the Release workflow has checked it, on demand, and nightly once a release exists.
 on:
   workflow_run:
     workflows: [Release]

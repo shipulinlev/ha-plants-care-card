@@ -102,7 +102,7 @@ The design handoff is in [docs/design/](docs/design/): open `Plant Card.dc.html`
 npm install
 npm run dev     # dev harness with a mock hass: every layout, light and dark
 npm test        # unit tests
-npm run build   # dist/ha-plants-care-card.js
+npm run build   # dist/ha-plants-care-card.js, committed: HACS installs it from the release tag
 ```
 
 ## License
